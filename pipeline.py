@@ -130,6 +130,20 @@ def add_combo():
     conn.close()
 
 
+def add_stop():
+    conn = get_conn()
+    city = input("ville / spot (ex: Numazu / Izu): ").strip()
+    dates = input("dates (ex: 29-30 nov): ").strip()
+    species = input("espèces ciblées, séparées par des virgules: ").strip()
+    cur = conn.execute(
+        "INSERT INTO trip_stops (city, dates, target_species) VALUES (?, ?, ?)",
+        (city, dates, species),
+    )
+    conn.commit()
+    print(f"Étape créée, id = {cur.lastrowid}")
+    conn.close()
+
+
 def link_combo(lure_id, combo_id):
     conn = get_conn()
     conn.execute(
@@ -332,11 +346,19 @@ def export_json():
     combos_rows = conn.execute("SELECT * FROM combos").fetchall()
     combos_out = [dict(c) for c in combos_rows]
 
+    stops_rows = conn.execute("SELECT * FROM trip_stops ORDER BY id").fetchall()
+    stops_out = [
+        {"id": s["id"], "city": s["city"], "dates": s["dates"],
+         "target_species": [x.strip() for x in (s["target_species"] or "").split(",") if x.strip()]}
+        for s in stops_rows
+    ]
+
     result = {
         "species": species_out,
         "observations": obs_out,
         "lures": lures_out,
         "combos": combos_out,
+        "trip_stops": stops_out,
     }
 
     out_path = os.path.join(os.path.dirname(__file__), "data.json")
@@ -360,6 +382,8 @@ if __name__ == "__main__":
         add_lure()
     elif cmd == "add-combo":
         add_combo()
+    elif cmd == "add-stop":
+        add_stop()
     elif cmd == "link-combo":
         link_combo(int(sys.argv[2]), int(sys.argv[3]))
     elif cmd == "extract":

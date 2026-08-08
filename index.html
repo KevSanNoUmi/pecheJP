@@ -53,6 +53,22 @@
   .species-card .name{font-family:'Fraunces', serif; font-weight:600; font-size:14.5px;}
   .species-card .jp{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-top:2px;}
 
+  .home-section{margin-top:26px;}
+  .home-section:first-child{margin-top:4px;}
+  .home-section-title{font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em;
+    color:var(--accent); font-family:'IBM Plex Mono', monospace; margin:0 0 12px;}
+
+  .pad-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;}
+  .pad{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer;}
+  .pad .pad-title{font-family:'Fraunces', serif; font-weight:600; font-size:14px; line-height:1.25;}
+  .pad .pad-sub{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); margin-top:5px;}
+
+  .pad-detail{grid-column:1 / -1; background:var(--surface-2); border:1px solid var(--accent); border-radius:12px; padding:13px 14px; margin-top:-2px; font-size:13px;}
+  .pad-detail .k{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--text-muted); margin-bottom:5px;}
+  .pad-detail .chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .pad-detail .chip{background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px 10px; font-size:12px;}
+  .pad-detail .chip.linkable{color:var(--accent); cursor:pointer; border-color:var(--accent);}
+
   /* --- Page espèce --- */
   .section{margin-top:22px;}
   .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
@@ -103,9 +119,11 @@
 <main id="mainZone"></main>
 
 <script>
-let DATA = {species:[], observations:[], lures:[], combos:[]};
+let DATA = {species:[], observations:[], lures:[], combos:[], trip_stops:[]};
 let currentSpeciesId = null;
 let qcmState = null; // {step, answers:{}}
+let openStopId = null;
+let openComboName = null;
 
 const DIM_LABELS = {
   saison:"Saison", maree:"Marée", moment_jour:"Moment de jour", spot_type:"Type de spot",
@@ -124,7 +142,7 @@ async function loadData(){
   try{
     const res = await fetch('data.json', {cache:'no-store'});
     DATA = await res.json();
-  }catch(e){ DATA = {species:[], observations:[], lures:[], combos:[]}; }
+  }catch(e){ DATA = {species:[], observations:[], lures:[], combos:[], trip_stops:[]}; }
   route();
 }
 
@@ -153,17 +171,82 @@ function renderHome(){
     <p class="sub">Espèces · saisons · marées · leurres</p>
     ${tidewaveSVG()}
   `;
-  const grid = DATA.species.map(sp => `
+
+  const stopsGrid = DATA.trip_stops.map(s => `
+    <div class="pad" onclick="toggleStop(${s.id})">
+      <div class="pad-title">${s.city}</div>
+      <div class="pad-sub">${s.dates}</div>
+    </div>
+    ${openStopId === s.id ? stopDetail(s) : ''}
+  `).join('');
+
+  const speciesGrid = DATA.species.map(sp => `
     <div class="species-card" onclick="location.hash='species/${sp.id}'">
       <div class="species-icon"></div>
       <div class="name">${sp.name_fr}</div>
       <div class="jp">${sp.name_jp}</div>
     </div>
   `).join('');
-  document.getElementById('mainZone').innerHTML = DATA.species.length
-    ? `<div class="species-grid">${grid}</div>`
-    : `<div class="empty">Aucune espèce dans la base pour l'instant.</div>`;
+
+  const combosGrid = DATA.combos.map(c => `
+    <div class="pad" onclick="toggleCombo('${c.name}')">
+      <div class="pad-title">${c.name}</div>
+      <div class="pad-sub">${c.description||''}</div>
+    </div>
+    ${openComboName === c.name ? comboDetail(c) : ''}
+  `).join('');
+
+  document.getElementById('mainZone').innerHTML = `
+    <div class="home-section">
+      <p class="home-section-title">Où je pêche</p>
+      ${DATA.trip_stops.length ? `<div class="pad-grid">${stopsGrid}</div>` : `<div class="empty">Aucune étape renseignée pour l'instant.</div>`}
+    </div>
+
+    <div class="home-section">
+      <p class="home-section-title">Espèces</p>
+      ${DATA.species.length ? `<div class="species-grid">${speciesGrid}</div>` : `<div class="empty">Aucune espèce dans la base pour l'instant.</div>`}
+    </div>
+
+    <div class="home-section">
+      <p class="home-section-title">Combos</p>
+      ${DATA.combos.length ? `<div class="pad-grid">${combosGrid}</div>` : `<div class="empty">Aucun combo renseigné pour l'instant.</div>`}
+    </div>
+  `;
 }
+
+function stopDetail(s){
+  const chips = s.target_species.map(name=>{
+    const sp = DATA.species.find(x=>x.name_fr.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(x.name_fr.split(' ')[0].toLowerCase()));
+    return sp
+      ? `<span class="chip linkable" onclick="location.hash='species/${sp.id}'">${name}</span>`
+      : `<span class="chip">${name}</span>`;
+  }).join('');
+  return `<div class="pad-detail">
+    <div class="k">Espèces ciblées</div>
+    <div class="chips">${chips || '—'}</div>
+  </div>`;
+}
+
+function toggleStop(id){ openStopId = (openStopId===id) ? null : id; renderHome(); }
+
+function comboDetail(c){
+  const lures = DATA.lures.filter(l=>l.combos.includes(c.name));
+  const bySpecies = {};
+  lures.forEach(l=>{
+    bySpecies[l.species_id] = bySpecies[l.species_id] || [];
+    bySpecies[l.species_id].push(l);
+  });
+  const blocks = Object.entries(bySpecies).map(([spId, ls])=>{
+    const sp = DATA.species.find(s=>s.id==spId);
+    const chips = ls.map(l=>`<span class="chip">${l.name}</span>`).join('');
+    return `<div class="k" style="margin-top:8px;">${sp?sp.name_fr:'Espèce'}</div><div class="chips">${chips}</div>`;
+  }).join('');
+  return `<div class="pad-detail">
+    ${blocks || '<div class="k">Aucun leurre rattaché pour l\u2019instant</div>'}
+  </div>`;
+}
+
+function toggleCombo(name){ openComboName = (openComboName===name) ? null : name; renderHome(); }
 
 function speciesObservations(id){ return DATA.observations.filter(o=>o.species_id===id); }
 function speciesLures(id){ return DATA.lures.filter(l=>l.species_id===id).sort((a,b)=>a.rank-b.rank); }

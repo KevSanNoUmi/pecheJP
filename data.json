@@ -74,5 +74,60 @@
       "name": "SP82M",
       "description": "hirame standard / conditions calmes"
     }
+  ],
+  "trip_stops": [
+    {
+      "id": 1,
+      "city": "Fukuoka (canaux urbains, Naka-gawa)",
+      "dates": "15 nov (soir)",
+      "target_species": [
+        "Suzuki",
+        "Aji"
+      ]
+    },
+    {
+      "id": 2,
+      "city": "Shikanoshima / Itoshima",
+      "dates": "17 nov",
+      "target_species": [
+        "Kurodai",
+        "Mebaru"
+      ]
+    },
+    {
+      "id": 3,
+      "city": "Kobe / Akashi",
+      "dates": "22-23 nov",
+      "target_species": [
+        "Madai",
+        "Tachiuo"
+      ]
+    },
+    {
+      "id": 4,
+      "city": "Irago / Kamishima",
+      "dates": "27-28 nov",
+      "target_species": [
+        "Hamachi",
+        "Saba"
+      ]
+    },
+    {
+      "id": 5,
+      "city": "Numazu / Izu (surf)",
+      "dates": "29-30 nov",
+      "target_species": [
+        "Hirame",
+        "Aori-Ika"
+      ]
+    },
+    {
+      "id": 6,
+      "city": "Kashima",
+      "dates": "4 déc",
+      "target_species": [
+        "Hirame"
+      ]
+    }
   ]
 }

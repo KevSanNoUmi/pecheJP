@@ -72,6 +72,14 @@ CREATE TABLE IF NOT EXISTS lure_combo (
     PRIMARY KEY (lure_id, combo_id)
 );
 
+-- Étapes du voyage où il pêche réellement (jours perso, hors tournage)
+CREATE TABLE IF NOT EXISTS trip_stops (
+    id INTEGER PRIMARY KEY,
+    city TEXT NOT NULL,
+    dates TEXT NOT NULL,          -- ex: "27-28 nov"
+    target_species TEXT           -- texte libre, séparé par virgules
+);
+
 -- Seed des dimensions de tags (v2 : + couleur_eau, pression_atmo pour le QCM)
 INSERT OR IGNORE INTO tag_dimensions (name) VALUES
     ('saison'), ('maree'), ('moment_jour'), ('spot_type'),
