@@ -1,46 +1,56 @@
 # Carnet Pêche JP
 
-Base de connaissance pêche Japon, construite à partir de scraping de blogs/sites
-japonais spécialisés et de transcriptions de vidéos, consultable en PWA installable
-sur téléphone.
+Base de connaissance pêche Japon (scraping blogs/sites spécialisés + transcriptions
+vidéos), consultable en PWA installable sur téléphone.
 
 ## Structure
 
 - `index.html`, `manifest.json`, `sw.js`, `data.json`, `icon-*.png`, `apple-touch-icon.png`
-  → l'app (PWA, hébergée sur GitHub Pages)
+  → l'app (PWA, hébergée sur GitHub Pages) : accueil grille d'espèces → page espèce
+  (comportement, où/quand, top 10 leurres par combo, QCM de recommandation)
 - `pipeline.py`, `schema.sql`
-  → le pipeline local d'extraction (texte/transcription → SQLite → JSON)
+  → pipeline local d'extraction (texte/transcription → SQLite → data.json)
 - `peche_jp.db`
   → base de travail locale, **jamais versionnée** (voir `.gitignore`)
+
+## QCM — vocabulaire contrôlé
+
+Pour que le QCM de l'app puisse matcher les recommandations aux conditions du
+moment, deux dimensions utilisent un vocabulaire fixe (imposé au LLM dans le
+prompt d'extraction) :
+- `couleur_eau` : claire / trouble / verte
+- `pression_atmo` : basse / moyenne / haute (bucket auto : <1013 basse, 1013–1020
+  moyenne, >1020 haute — relevé via Open-Meteo, gratuit et sans clé, géolocalisé
+  côté navigateur ; secours manuel si hors réseau)
 
 ## Workflow d'enrichissement
 
 ```bash
-# 1. Première fois seulement
-python3 pipeline.py init
-python3 pipeline.py add-source
-
-# 2. À chaque nouvelle source (texte scrapé ou transcription collée)
 export ANTHROPIC_API_KEY=sk-ant-...
+
+# Sources et observations (comme avant)
+python3 pipeline.py add-source
 python3 pipeline.py extract <source_id> <fichier.txt>
 python3 pipeline.py review
-python3 pipeline.py validate <observation_id>   # pour chaque obs à valider
-python3 pipeline.py export                        # génère peche_jp_export.json
+python3 pipeline.py validate <observation_id>
 
-# 3. Mise à jour de l'app
-cp peche_jp_export.json data.json
+# Leurres et combos (curation manuelle, max 10 leurres/espèce)
+python3 pipeline.py add-lure
+python3 pipeline.py add-combo
+python3 pipeline.py link-combo <lure_id> <combo_id>
+
+# Export + mise à jour de l'app
+python3 pipeline.py export        # régénère data.json directement à la racine
 git add data.json
 git commit -m "Ajout observations — <source>"
 git push
 ```
 
-GitHub Pages redéploie automatiquement. Le service worker force le rechargement
-réseau de `data.json` à chaque ouverture, donc le tel a toujours la dernière version.
-
 ## Mise en ligne (première fois)
 
 1. Crée le repo sur GitHub (public, sans README auto-généré)
-2. `git init && git add . && git commit -m "Init carnet pêche JP"`
-3. `git remote add origin <url-du-repo> && git push -u origin main`
-4. Settings → Pages → Source: branche `main`, dossier `/root`
-5. Sur le tel : ouvrir l'URL → Partager → "Sur l'écran d'accueil"
+2. `python3 pipeline.py init` pour créer `peche_jp.db` en local
+3. `git init && git add . && git commit -m "Init carnet pêche JP"`
+4. `git remote add origin <url-du-repo> && git push -u origin main`
+5. Settings → Pages → Source: branche `main`, dossier `/root`
+6. Sur le tel : ouvrir l'URL → Partager → "Sur l'écran d'accueil"

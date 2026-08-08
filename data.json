@@ -1,43 +1,78 @@
-[
-  {
-    "id": 1,
-    "species": "Hirame (limande japonaise)",
-    "text": "En novembre, le hirame se rapproche du bord à l'aube et au crépuscule pour chasser les petits poissons dans la zone de déferlement.",
-    "confidence": 0.85,
-    "source": "Exemple — Tenryu Fishing",
-    "source_type": "marque",
-    "tags": {
-      "saison": "novembre",
-      "moment_jour": "aube/crépuscule",
-      "spot_type": "plage à déferlement",
-      "comportement": "chasse active"
+{
+  "species": [
+    {
+      "id": 1,
+      "name_jp": "ヒラメ",
+      "name_fr": "Hirame (limande japonaise)",
+      "name_latin": "Paralichthys olivaceus"
     }
-  },
-  {
-    "id": 2,
-    "species": "Hirame (limande japonaise)",
-    "text": "La marée montante concentre les proies dans les creux (cuvettes) de la plage, le hirame s'y positionne pour attendre.",
-    "confidence": 0.7,
-    "source": "Exemple — blog spécialiste surf casting",
-    "source_type": "blog",
-    "tags": {
-      "maree": "montante",
-      "spot_type": "cuvette de plage",
-      "comportement": "affût"
+  ],
+  "observations": [
+    {
+      "id": 1,
+      "species_id": 1,
+      "species": "Hirame (limande japonaise)",
+      "text": "Le hirame chasse activement à l aube en novembre sur les plages à déferlement",
+      "confidence": 0.85,
+      "source": "Tenryu Fishing",
+      "source_type": "marque",
+      "tags": {
+        "saison": "novembre",
+        "moment_jour": "aube",
+        "spot_type": "plage à déferlement",
+        "couleur_eau": "claire",
+        "maree": "montante"
+      },
+      "recommendation": {
+        "lure": "Jerkbait 120mm",
+        "color": "ormeau nacré",
+        "animation": "animation lente saccadée près du fond",
+        "leader": "fluoro 20lb"
+      }
+    },
+    {
+      "id": 2,
+      "species_id": 1,
+      "species": "Hirame (limande japonaise)",
+      "text": "Comportement général: le hirame reste posé sur fond sableux, embusqué",
+      "confidence": 0.7,
+      "source": "Blog surfcasting JP",
+      "source_type": "blog",
+      "tags": {}
     }
-  },
-  {
-    "id": 3,
-    "species": "Hirame (limande japonaise)",
-    "text": "Un jerkbait coulant lent, animé près du fond, imite bien les petits poissons dont se nourrit le hirame en eau froide de début décembre.",
-    "confidence": 0.6,
-    "source": "Exemple — transcription vidéo pêcheur local",
-    "source_type": "video",
-    "tags": {
-      "saison": "décembre",
-      "leurre": "jerkbait coulant lent",
-      "temperature_eau": "froide",
-      "profondeur": "proche du fond"
+  ],
+  "lures": [
+    {
+      "id": 1,
+      "species_id": 1,
+      "name": "Jerkbait 120mm",
+      "type": "jerkbait",
+      "rank": 1,
+      "combos": [
+        "SP82MH"
+      ]
+    },
+    {
+      "id": 2,
+      "species_id": 1,
+      "name": "Vibration 90mm",
+      "type": "vibration",
+      "rank": 2,
+      "combos": [
+        "SP82M"
+      ]
     }
-  }
-]
+  ],
+  "combos": [
+    {
+      "id": 1,
+      "name": "SP82MH",
+      "description": "gros hirame / grosses conditions"
+    },
+    {
+      "id": 2,
+      "name": "SP82M",
+      "description": "hirame standard / conditions calmes"
+    }
+  ]
+}

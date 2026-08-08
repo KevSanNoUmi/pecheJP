@@ -14,353 +14,352 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0F1720;
-    --surface:#172233;
-    --surface-2:#1E2C40;
-    --accent:#E8A33D;
-    --accent-dim:#8A6A34;
-    --text:#EDEEF0;
-    --text-muted:#8B97A8;
-    --flag:#C4694F;
+    --bg:#0F1720; --surface:#172233; --surface-2:#1E2C40;
+    --accent:#E8A33D; --accent-dim:#8A6A34;
+    --text:#EDEEF0; --text-muted:#8B97A8; --flag:#C4694F;
     --border:rgba(232,163,61,0.16);
-    --safe-top:env(safe-area-inset-top,0px);
-    --safe-bottom:env(safe-area-inset-bottom,0px);
+    --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'IBM Plex Sans', system-ui, sans-serif;
-    min-height:100vh;
-    overscroll-behavior-y:none;
-  }
-  h1,h2,.display{
-    font-family:'Fraunces', serif;
-    font-optical-sizing:auto;
-    letter-spacing:-0.01em;
-  }
+  body{background:var(--bg); color:var(--text); font-family:'IBM Plex Sans', system-ui, sans-serif; min-height:100vh; overscroll-behavior-y:none;}
+  h1,h2,h3,.display{font-family:'Fraunces', serif; font-optical-sizing:auto; letter-spacing:-0.01em;}
   .mono{font-family:'IBM Plex Mono', monospace;}
+  button{font-family:inherit;}
 
-  header{
-    position:sticky; top:0; z-index:10;
-    padding:calc(18px + var(--safe-top)) 18px 14px;
-    background:linear-gradient(180deg, var(--bg) 60%, rgba(15,23,32,0.94));
-    border-bottom:1px solid var(--border);
-  }
-  header .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
-    color:var(--accent); margin:0 0 4px;
-  }
-  header h1{
-    font-size:26px; font-weight:600; margin:0 0 2px; color:var(--text);
-  }
+  header{position:sticky; top:0; z-index:10; padding:calc(16px + var(--safe-top)) 18px 14px;
+    background:linear-gradient(180deg, var(--bg) 60%, rgba(15,23,32,0.94)); border-bottom:1px solid var(--border);}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin:0 0 4px;}
+  header h1{font-size:24px; font-weight:600; margin:0 0 2px; color:var(--text);}
   header .sub{color:var(--text-muted); font-size:13px; margin:0;}
+  .tidewave{width:100%; height:18px; margin-top:12px; opacity:0.5;}
 
-  .tidewave{
-    width:100%; height:22px; margin-top:14px; opacity:0.55;
-  }
-
-  .species-row{
-    display:flex; gap:8px; margin-top:14px; overflow-x:auto;
-    padding-bottom:2px;
-    -ms-overflow-style:none; scrollbar-width:none;
-  }
-  .species-row::-webkit-scrollbar{display:none;}
-  .species-pill{
-    flex:0 0 auto;
-    padding:8px 14px;
-    border-radius:999px;
-    background:var(--surface);
-    border:1px solid var(--border);
-    color:var(--text-muted);
-    font-size:13.5px; font-weight:500;
-    white-space:nowrap;
-  }
-  .species-pill.active{
-    background:var(--accent); color:#0F1720; border-color:var(--accent);
-    font-weight:600;
-  }
-
-  .filter-toggle{
-    margin-top:14px;
-    display:flex; align-items:center; justify-content:space-between;
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:10px 14px;
-    color:var(--text);
-    font-size:13.5px;
-  }
-  .filter-toggle button{
-    all:unset; cursor:pointer; color:var(--accent); font-weight:600; font-size:13px;
-  }
-  .active-tags{
-    display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;
-  }
-  .active-tag{
-    display:flex; align-items:center; gap:6px;
-    background:var(--surface-2); border:1px solid var(--border);
-    border-radius:999px; padding:5px 10px 5px 12px;
-    font-size:12px; font-family:'IBM Plex Mono', monospace; color:var(--accent);
-  }
-  .active-tag button{
-    all:unset; cursor:pointer; color:var(--text-muted); font-size:14px; line-height:1;
-  }
-
-  #filterPanel{
-    display:none;
-    margin-top:12px;
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:14px;
-    max-height:50vh; overflow-y:auto;
-  }
-  #filterPanel.open{display:block;}
-  .dim-group{margin-bottom:14px;}
-  .dim-group:last-child{margin-bottom:0;}
-  .dim-label{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--text-muted); margin-bottom:7px;
-  }
-  .dim-values{display:flex; flex-wrap:wrap; gap:6px;}
-  .val-chip{
-    padding:6px 11px; border-radius:8px;
-    background:var(--surface-2); border:1px solid var(--border);
-    color:var(--text); font-size:12.5px; cursor:pointer;
-  }
-  .val-chip.selected{
-    background:var(--accent); color:#0F1720; border-color:var(--accent); font-weight:600;
-  }
+  .back-row{display:flex; align-items:center; gap:10px;}
+  .back-btn{all:unset; cursor:pointer; color:var(--accent); font-size:20px; line-height:1; padding:4px 6px 4px 0;}
 
   main{padding:16px 18px calc(40px + var(--safe-bottom));}
-  .result-count{
-    color:var(--text-muted); font-size:12.5px; margin:0 0 12px;
-    font-family:'IBM Plex Mono', monospace;
-  }
 
-  .card{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:16px;
-    margin-bottom:12px;
+  /* --- Accueil : grille d'espèces --- */
+  .species-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-top:4px;}
+  .species-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:18px 14px; cursor:pointer; text-align:center;
   }
-  .card-top{
-    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
-    margin-bottom:10px;
+  .species-icon{
+    width:56px; height:56px; margin:0 auto 10px; border-radius:50%;
+    background:radial-gradient(circle at 50% 40%, var(--accent) 0%, var(--accent-dim) 55%, transparent 75%);
+    display:flex; align-items:center; justify-content:center;
   }
-  .card-species{
-    font-family:'Fraunces', serif; font-weight:600; font-size:15px; color:var(--text);
-  }
-  .confidence{
-    flex:0 0 auto;
-    font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600;
-    padding:3px 8px; border-radius:999px;
-    white-space:nowrap;
-  }
-  .confidence.high{background:rgba(232,163,61,0.18); color:var(--accent);}
-  .confidence.mid{background:rgba(139,151,168,0.18); color:var(--text-muted);}
-  .confidence.low{background:rgba(196,105,79,0.18); color:var(--flag);}
+  .species-card .name{font-family:'Fraunces', serif; font-weight:600; font-size:14.5px;}
+  .species-card .jp{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-top:2px;}
 
-  .card-text{font-size:14.5px; line-height:1.5; color:var(--text); margin:0 0 12px;}
+  /* --- Page espèce --- */
+  .section{margin-top:22px;}
+  .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--accent); font-family:'IBM Plex Mono', monospace; margin:0 0 10px;}
 
-  .card-tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
-  .tag{
-    font-family:'IBM Plex Mono', monospace; font-size:11px;
-    background:var(--surface-2); color:var(--text-muted);
-    padding:3px 8px; border-radius:6px;
-  }
-  .tag b{color:var(--accent); font-weight:600;}
+  .fact-card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:8px; font-size:13.5px; line-height:1.5;}
+  .fact-meta{margin-top:8px; display:flex; flex-wrap:wrap; gap:6px;}
+  .tag{font-family:'IBM Plex Mono', monospace; font-size:10.5px; background:var(--surface-2); color:var(--text-muted); padding:3px 7px; border-radius:6px;}
 
-  .card-source{
-    display:flex; justify-content:space-between; align-items:center;
-    font-size:11.5px; color:var(--text-muted);
-    border-top:1px solid var(--border); padding-top:9px;
-  }
-  .source-type{
-    font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.06em;
-    font-size:10px;
-  }
+  .where-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .where-box{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px;}
+  .where-box .dim-name{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:6px;}
+  .where-box .vals{font-size:13px; line-height:1.5;}
 
-  .empty{
-    text-align:center; color:var(--text-muted); padding:60px 20px;
-    font-size:14px;
-  }
+  .combo-block{margin-bottom:14px;}
+  .combo-header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px;}
+  .combo-name{font-family:'Fraunces', serif; font-weight:600; font-size:15px; color:var(--accent);}
+  .combo-desc{font-size:11.5px; color:var(--text-muted);}
+  .lure-row{display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 13px; margin-bottom:6px;}
+  .lure-name{font-size:13.5px; font-weight:500;}
+  .lure-type{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted);}
+  .lure-rank{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--accent); background:rgba(232,163,61,0.14); border-radius:999px; padding:2px 8px;}
+
+  /* --- QCM --- */
+  .qcm-cta{width:100%; background:var(--accent); color:#0F1720; border:none; border-radius:12px; padding:15px; font-size:15px; font-weight:600; cursor:pointer; margin-top:6px;}
+  .qcm-panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:14px;}
+  .qcm-step-label{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-bottom:10px;}
+  .qcm-question{font-family:'Fraunces', serif; font-weight:600; font-size:16px; margin:0 0 14px;}
+  .qcm-options{display:flex; flex-direction:column; gap:8px;}
+  .qcm-opt{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; font-size:14px; cursor:pointer; text-align:left;}
+  .qcm-opt.selected{background:var(--accent); color:#0F1720; border-color:var(--accent); font-weight:600;}
+  .qcm-auto{font-size:12px; color:var(--text-muted); margin-top:10px; font-family:'IBM Plex Mono', monospace;}
+  .qcm-manual-input{width:100%; margin-top:8px; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:13px;}
+
+  .reco-card{background:var(--surface); border:1px solid var(--accent); border-radius:14px; padding:16px; margin-bottom:10px;}
+  .reco-lure{font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--accent); margin-bottom:8px;}
+  .reco-row{display:flex; gap:8px; font-size:13px; margin-bottom:5px;}
+  .reco-row .k{color:var(--text-muted); font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; min-width:88px; padding-top:2px;}
+  .reco-source{margin-top:10px; padding-top:9px; border-top:1px solid var(--border); font-size:11px; color:var(--text-muted);}
+
+  .empty{text-align:center; color:var(--text-muted); padding:40px 20px; font-size:13.5px;}
+  .restart-btn{all:unset; cursor:pointer; color:var(--accent); font-size:13px; font-family:'IBM Plex Mono', monospace; margin-top:14px; display:inline-block;}
 </style>
 </head>
 <body>
 
-<header>
-  <p class="eyebrow">Base de connaissance</p>
-  <h1>Carnet Pêche JP</h1>
-  <p class="sub">Espèces · saisons · marées · leurres — sources japonaises</p>
-
-  <svg class="tidewave" viewBox="0 0 400 22" preserveAspectRatio="none">
-    <polyline points="0,14 20,6 40,18 60,6 80,18 100,6 120,18 140,6 160,18 180,6 200,18 220,6 240,18 260,6 280,18 300,6 320,18 340,6 360,18 380,6 400,14"
-      fill="none" stroke="#E8A33D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-
-  <div class="species-row" id="speciesRow"></div>
-
-  <div class="filter-toggle">
-    <span id="filterSummary">Aucun filtre actif</span>
-    <button id="filterToggleBtn">Filtres</button>
-  </div>
-  <div class="active-tags" id="activeTags"></div>
-
-  <div id="filterPanel"></div>
-</header>
-
-<main>
-  <p class="result-count" id="resultCount"></p>
-  <div id="cardList"></div>
-</main>
+<header id="headerZone"></header>
+<main id="mainZone"></main>
 
 <script>
-let DATA = [];
-let SPECIES = [];
-let activeSpecies = null;
-let activeFilters = {}; // { dimension: value }
+let DATA = {species:[], observations:[], lures:[], combos:[]};
+let currentSpeciesId = null;
+let qcmState = null; // {step, answers:{}}
 
 const DIM_LABELS = {
-  saison: "Saison", maree: "Marée", moment_jour: "Moment de jour",
-  spot_type: "Type de spot", leurre: "Leurre", comportement: "Comportement",
-  profondeur: "Profondeur", temperature_eau: "Température de l'eau"
+  saison:"Saison", maree:"Marée", moment_jour:"Moment de jour", spot_type:"Type de spot",
+  leurre:"Leurre", comportement:"Comportement", profondeur:"Profondeur",
+  temperature_eau:"Température de l'eau", couleur_eau:"Couleur de l'eau", pression_atmo:"Pression atmo"
 };
+
+const QCM_STEPS = [
+  {dim:"moment_jour", question:"Quelle est la lumière ambiante ?", fallback:["Aube / crépuscule","Plein jour","Nuit"]},
+  {dim:"maree", question:"Où en est la marée ?", fallback:["Montante","Descendante","Étale"]},
+  {dim:"couleur_eau", question:"Comment est la couleur de l'eau ?", fallback:["claire","trouble","verte"]},
+  {dim:"pression_atmo", question:"Pression atmosphérique ?", auto:true, fallback:["basse","moyenne","haute"]},
+];
 
 async function loadData(){
   try{
     const res = await fetch('data.json', {cache:'no-store'});
     DATA = await res.json();
-  }catch(e){
-    DATA = [];
+  }catch(e){ DATA = {species:[], observations:[], lures:[], combos:[]}; }
+  route();
+}
+
+function tidewaveSVG(h=18){
+  return `<svg class="tidewave" viewBox="0 0 400 ${h}" preserveAspectRatio="none">
+    <polyline points="0,${h*0.6},20,${h*0.25},40,${h*0.8},60,${h*0.25},80,${h*0.8},100,${h*0.25},120,${h*0.8},140,${h*0.25},160,${h*0.8},180,${h*0.25},200,${h*0.8},220,${h*0.25},240,${h*0.8},260,${h*0.25},280,${h*0.8},300,${h*0.25},320,${h*0.8},340,${h*0.25},360,${h*0.8},380,${h*0.25},400,${h*0.6}"
+      fill="none" stroke="#E8A33D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function route(){
+  const hash = location.hash.replace('#','');
+  if(hash.startsWith('species/')){
+    currentSpeciesId = parseInt(hash.split('/')[1]);
+    qcmState = null;
+    renderSpeciesPage();
+  } else {
+    renderHome();
   }
-  SPECIES = [...new Set(DATA.map(o => o.species))];
-  activeSpecies = SPECIES[0] || null;
-  renderSpecies();
-  renderFilterPanel();
-  render();
+}
+window.addEventListener('hashchange', route);
+
+function renderHome(){
+  document.getElementById('headerZone').innerHTML = `
+    <p class="eyebrow">Base de connaissance</p>
+    <h1>Carnet Pêche JP</h1>
+    <p class="sub">Espèces · saisons · marées · leurres</p>
+    ${tidewaveSVG()}
+  `;
+  const grid = DATA.species.map(sp => `
+    <div class="species-card" onclick="location.hash='species/${sp.id}'">
+      <div class="species-icon"></div>
+      <div class="name">${sp.name_fr}</div>
+      <div class="jp">${sp.name_jp}</div>
+    </div>
+  `).join('');
+  document.getElementById('mainZone').innerHTML = DATA.species.length
+    ? `<div class="species-grid">${grid}</div>`
+    : `<div class="empty">Aucune espèce dans la base pour l'instant.</div>`;
 }
 
-function renderSpecies(){
-  const row = document.getElementById('speciesRow');
-  row.innerHTML = SPECIES.map(sp =>
-    `<div class="species-pill ${sp===activeSpecies?'active':''}" data-sp="${sp}">${sp}</div>`
-  ).join('');
-  row.querySelectorAll('.species-pill').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      activeSpecies = el.dataset.sp;
-      activeFilters = {};
-      renderSpecies(); renderFilterPanel(); render();
-    });
-  });
-}
+function speciesObservations(id){ return DATA.observations.filter(o=>o.species_id===id); }
+function speciesLures(id){ return DATA.lures.filter(l=>l.species_id===id).sort((a,b)=>a.rank-b.rank); }
 
-function availableDims(){
-  const dims = {};
-  DATA.filter(o=>o.species===activeSpecies).forEach(o=>{
-    Object.entries(o.tags||{}).forEach(([dim,val])=>{
-      dims[dim] = dims[dim] || new Set();
-      dims[dim].add(val);
-    });
-  });
-  return dims;
-}
+function renderSpeciesPage(){
+  const sp = DATA.species.find(s=>s.id===currentSpeciesId);
+  if(!sp){ location.hash=''; return; }
 
-function renderFilterPanel(){
-  const dims = availableDims();
-  const panel = document.getElementById('filterPanel');
-  const order = Object.keys(DIM_LABELS).filter(d=>dims[d]);
-  panel.innerHTML = order.map(dim=>{
-    const values = [...dims[dim]].sort();
-    return `<div class="dim-group">
-      <div class="dim-label">${DIM_LABELS[dim]}</div>
-      <div class="dim-values">
-        ${values.map(v=>`<div class="val-chip ${activeFilters[dim]===v?'selected':''}" data-dim="${dim}" data-val="${v}">${v}</div>`).join('')}
+  document.getElementById('headerZone').innerHTML = `
+    <div class="back-row">
+      <button class="back-btn" onclick="location.hash=''">←</button>
+      <div>
+        <p class="eyebrow">${sp.name_jp}</p>
+        <h1 style="font-size:21px;">${sp.name_fr}</h1>
       </div>
+    </div>
+    ${tidewaveSVG(14)}
+  `;
+
+  const obs = speciesObservations(sp.id);
+  const behaviorObs = obs.filter(o=>!o.recommendation);
+  const lures = speciesLures(sp.id);
+  const combos = [...new Set(lures.flatMap(l=>l.combos))].map(name => DATA.combos.find(c=>c.name===name)).filter(Boolean);
+  const unassigned = lures.filter(l=>l.combos.length===0);
+
+  // Où & quand : agrégation des valeurs de tags marée / moment_jour / spot_type observées
+  const whereDims = ["maree","moment_jour","spot_type"];
+  const whereBoxes = whereDims.map(dim=>{
+    const vals = [...new Set(obs.map(o=>o.tags[dim]).filter(Boolean))];
+    return `<div class="where-box">
+      <div class="dim-name">${DIM_LABELS[dim]}</div>
+      <div class="vals">${vals.length ? vals.join(', ') : '—'}</div>
     </div>`;
-  }).join('') || `<div class="empty" style="padding:20px;">Pas encore de tags pour cette espèce.</div>`;
+  }).join('');
 
-  panel.querySelectorAll('.val-chip').forEach(chip=>{
-    chip.addEventListener('click', ()=>{
-      const {dim, val} = chip.dataset;
-      if(activeFilters[dim] === val) delete activeFilters[dim];
-      else activeFilters[dim] = val;
-      renderFilterPanel(); renderActiveTags(); render();
-    });
-  });
+  let html = `
+    <div class="section">
+      <p class="section-title">Comportement · nov. – mi-déc.</p>
+      ${behaviorObs.length ? behaviorObs.map(factCard).join('') : `<div class="empty">Pas encore d'observation de comportement.</div>`}
+    </div>
+
+    <div class="section">
+      <p class="section-title">Où &amp; quand</p>
+      <div class="where-grid">${whereBoxes}</div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">Top leurres (${lures.length}/10)</p>
+      ${combos.map(c=>{
+        const cLures = lures.filter(l=>l.combos.includes(c.name));
+        return `<div class="combo-block">
+          <div class="combo-header">
+            <span class="combo-name">${c.name}</span>
+            <span class="combo-desc">${c.description||''}</span>
+          </div>
+          ${cLures.map(lureRow).join('')}
+        </div>`;
+      }).join('')}
+      ${unassigned.length ? `<div class="combo-block">
+        <div class="combo-header"><span class="combo-name" style="color:var(--text-muted)">Autres leurres</span></div>
+        ${unassigned.map(lureRow).join('')}
+      </div>` : ''}
+      ${!lures.length ? `<div class="empty">Aucun leurre renseigné pour l'instant.</div>` : ''}
+    </div>
+
+    <div class="section">
+      <p class="section-title">Config du moment</p>
+      <button class="qcm-cta" onclick="startQCM()">Trouver la config adaptée →</button>
+      <div id="qcmZone"></div>
+    </div>
+  `;
+  document.getElementById('mainZone').innerHTML = html;
 }
 
-function renderActiveTags(){
-  const wrap = document.getElementById('activeTags');
-  const entries = Object.entries(activeFilters);
-  wrap.innerHTML = entries.map(([dim,val])=>
-    `<div class="active-tag">${DIM_LABELS[dim]}: ${val}<button data-dim="${dim}">✕</button></div>`
-  ).join('');
-  wrap.querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      delete activeFilters[btn.dataset.dim];
-      renderFilterPanel(); renderActiveTags(); render();
-    });
-  });
-  document.getElementById('filterSummary').textContent =
-    entries.length ? `${entries.length} filtre(s) actif(s)` : 'Aucun filtre actif';
+function factCard(o){
+  const tags = Object.entries(o.tags||{}).map(([dim,val])=>`<span class="tag">${DIM_LABELS[dim]||dim}: ${val}</span>`).join('');
+  return `<div class="fact-card">
+    ${o.text}
+    <div class="fact-meta">${tags}</div>
+  </div>`;
 }
 
-function confidenceClass(c){
-  if(c >= 0.7) return 'high';
-  if(c >= 0.5) return 'mid';
-  return 'low';
+function lureRow(l){
+  return `<div class="lure-row">
+    <div><div class="lure-name">${l.name}</div><div class="lure-type">${l.type||''}</div></div>
+    <span class="lure-rank">#${l.rank}</span>
+  </div>`;
 }
 
-function render(){
-  const filtered = DATA.filter(o=>{
-    if(o.species !== activeSpecies) return false;
-    return Object.entries(activeFilters).every(([dim,val])=> (o.tags||{})[dim] === val);
-  });
+/* ---------------- QCM ---------------- */
 
-  document.getElementById('resultCount').textContent =
-    `${filtered.length} observation${filtered.length>1?'s':''}`;
+function startQCM(){
+  qcmState = {step:0, answers:{}};
+  renderQCM();
+}
 
-  const list = document.getElementById('cardList');
-  if(!filtered.length){
-    list.innerHTML = `<div class="empty">Aucune observation ne correspond à ces filtres.<br>Retire-en un pour élargir la recherche.</div>`;
+function availableOptions(dim){
+  const obs = speciesObservations(currentSpeciesId);
+  const vals = [...new Set(obs.map(o=>o.tags[dim]).filter(Boolean))];
+  return vals.length ? vals : null;
+}
+
+async function fetchPressure(){
+  const zone = document.getElementById('qcmZone');
+  zone.querySelector('.qcm-auto').textContent = 'Relevé en cours…';
+  try{
+    const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:6000}));
+    const {latitude, longitude} = pos.coords;
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=pressure_msl`);
+    const j = await r.json();
+    const hpa = j.current.pressure_msl;
+    const bucket = hpa < 1013 ? 'basse' : hpa <= 1020 ? 'moyenne' : 'haute';
+    selectQCMAnswer('pression_atmo', bucket, `${Math.round(hpa)} hPa relevés — ${bucket}`);
+  }catch(e){
+    zone.querySelector('.qcm-auto').textContent = 'Relevé impossible (hors réseau ou position refusée) — choisis manuellement ci-dessous.';
+  }
+}
+
+function renderQCM(){
+  const zone = document.getElementById('qcmZone');
+  if(!qcmState){ zone.innerHTML=''; return; }
+
+  if(qcmState.step >= QCM_STEPS.length){
+    renderQCMResults();
     return;
   }
 
-  list.innerHTML = filtered.map(o=>{
-    const cls = confidenceClass(o.confidence);
-    const label = cls==='high' ? 'fiable' : cls==='mid' ? 'moyen' : 'à vérifier';
-    const tags = Object.entries(o.tags||{}).map(([dim,val])=>
-      `<span class="tag"><b>${DIM_LABELS[dim]||dim}</b> ${val}</span>`
-    ).join('');
-    return `<div class="card">
-      <div class="card-top">
-        <span class="card-species">${o.species}</span>
-        <span class="confidence ${cls}">${label} · ${o.confidence.toFixed(2)}</span>
+  const step = QCM_STEPS[qcmState.step];
+  const opts = availableOptions(step.dim) || step.fallback;
+
+  let extra = '';
+  if(step.auto){
+    extra = `<div class="qcm-auto">Relevé automatique via Open-Meteo…</div>
+      <input class="qcm-manual-input" placeholder="ou tape une valeur manuelle (basse / moyenne / haute)"
+        onkeydown="if(event.key==='Enter') selectQCMAnswer('pression_atmo', this.value.trim())">`;
+  }
+
+  zone.innerHTML = `
+    <div class="qcm-panel">
+      <div class="qcm-step-label">Étape ${qcmState.step+1} / ${QCM_STEPS.length}</div>
+      <p class="qcm-question">${step.question}</p>
+      <div class="qcm-options">
+        ${opts.map(o=>`<button class="qcm-opt" onclick="selectQCMAnswer('${step.dim}', this.textContent)">${o}</button>`).join('')}
       </div>
-      <p class="card-text">${o.text}</p>
-      <div class="card-tags">${tags}</div>
-      <div class="card-source">
-        <span>${o.source}</span>
-        <span class="source-type">${o.source_type}</span>
-      </div>
-    </div>`;
-  }).join('');
+      ${extra}
+    </div>
+  `;
+
+  if(step.auto) fetchPressure();
 }
 
-document.getElementById('filterToggleBtn').addEventListener('click', ()=>{
-  document.getElementById('filterPanel').classList.toggle('open');
-});
+function selectQCMAnswer(dim, value, note){
+  qcmState.answers[dim] = value.toLowerCase();
+  qcmState.step += 1;
+  renderQCM();
+}
+
+function renderQCMResults(){
+  const obs = speciesObservations(currentSpeciesId).filter(o=>o.recommendation);
+  const answers = qcmState.answers;
+  const scored = obs.map(o=>{
+    let matches = 0;
+    Object.entries(answers).forEach(([dim,val])=>{
+      if(o.tags[dim] && o.tags[dim].toLowerCase() === val) matches++;
+    });
+    return {o, matches};
+  }).filter(r=>r.matches > 0).sort((a,b)=> b.matches - a.matches || b.o.confidence - a.o.confidence);
+
+  const zone = document.getElementById('qcmZone');
+  if(!scored.length){
+    zone.innerHTML = `<div class="qcm-panel">
+      <div class="empty">Pas de recommandation source pour cette combinaison précise pour l'instant.<br>Réfère-toi au top leurres ci-dessus en attendant d'avoir plus de données.</div>
+      <span class="restart-btn" onclick="startQCM()">↺ Refaire le QCM</span>
+    </div>`;
+    return;
+  }
+
+  zone.innerHTML = `
+    <div class="qcm-panel">
+      <p class="qcm-step-label">Résultat pour : ${Object.entries(answers).map(([d,v])=>`${DIM_LABELS[d]||d}=${v}`).join(' · ')}</p>
+      ${scored.map(({o})=>`
+        <div class="reco-card">
+          <div class="reco-lure">${o.recommendation.lure||'Config recommandée'}</div>
+          ${o.recommendation.color?`<div class="reco-row"><span class="k">Couleur</span>${o.recommendation.color}</div>`:''}
+          ${o.recommendation.animation?`<div class="reco-row"><span class="k">Animation</span>${o.recommendation.animation}</div>`:''}
+          ${o.recommendation.leader?`<div class="reco-row"><span class="k">Bas de ligne</span>${o.recommendation.leader}</div>`:''}
+          <div class="reco-source">${o.source} (${o.source_type}) · confiance ${o.confidence}</div>
+        </div>
+      `).join('')}
+      <span class="restart-btn" onclick="startQCM()">↺ Refaire le QCM</span>
+    </div>
+  `;
+}
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
 
 loadData();
