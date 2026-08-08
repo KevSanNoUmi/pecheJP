@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Carnet Pêche JP</title>
 <meta name="theme-color" content="#0F1720">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,42 +16,25 @@
   :root{
     --bg:#0F1720; --surface:#172233; --surface-2:#1E2C40;
     --accent:#E8A33D; --accent-dim:#8A6A34;
-    --text:#EDEEF0; --text-muted:#8B97A8; --flag:#C4694F;
+    --text:#EDEEF0; --text-muted:#8B97A8; --flag:#C4694F; --ok:#5FA87A;
     --border:rgba(232,163,61,0.16);
     --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{background:var(--bg); color:var(--text); font-family:'IBM Plex Sans', system-ui, sans-serif; min-height:100vh; overscroll-behavior-y:none;}
-  h1,h2,h3,.display{font-family:'Fraunces', serif; font-optical-sizing:auto; letter-spacing:-0.01em;}
-  .mono{font-family:'IBM Plex Mono', monospace;}
+  h1,h2,h3{font-family:'Fraunces', serif; font-optical-sizing:auto; letter-spacing:-0.01em;}
   button{font-family:inherit;}
 
   header{position:sticky; top:0; z-index:10; padding:calc(16px + var(--safe-top)) 18px 14px;
     background:linear-gradient(180deg, var(--bg) 60%, rgba(15,23,32,0.94)); border-bottom:1px solid var(--border);}
   .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin:0 0 4px;}
-  header h1{font-size:24px; font-weight:600; margin:0 0 2px; color:var(--text);}
+  header h1{font-size:24px; font-weight:600; margin:0 0 2px;}
   header .sub{color:var(--text-muted); font-size:13px; margin:0;}
-  .tidewave{width:100%; height:18px; margin-top:12px; opacity:0.5;}
-
   .back-row{display:flex; align-items:center; gap:10px;}
   .back-btn{all:unset; cursor:pointer; color:var(--accent); font-size:20px; line-height:1; padding:4px 6px 4px 0;}
 
   main{padding:16px 18px calc(40px + var(--safe-bottom));}
-
-  /* --- Accueil : grille d'espèces --- */
-  .species-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-top:4px;}
-  .species-card{
-    background:var(--surface); border:1px solid var(--border); border-radius:16px;
-    padding:18px 14px; cursor:pointer; text-align:center;
-  }
-  .species-icon{
-    width:56px; height:56px; margin:0 auto 10px; border-radius:50%;
-    background:radial-gradient(circle at 50% 40%, var(--accent) 0%, var(--accent-dim) 55%, transparent 75%);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .species-card .name{font-family:'Fraunces', serif; font-weight:600; font-size:14.5px;}
-  .species-card .jp{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-top:2px;}
 
   .home-section{margin-top:26px;}
   .home-section:first-child{margin-top:4px;}
@@ -62,21 +45,44 @@
   .pad{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer;}
   .pad .pad-title{font-family:'Fraunces', serif; font-weight:600; font-size:14px; line-height:1.25;}
   .pad .pad-sub{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); margin-top:5px;}
+  .pad.active-port{border-color:var(--accent);}
 
   .pad-detail{grid-column:1 / -1; background:var(--surface-2); border:1px solid var(--accent); border-radius:12px; padding:13px 14px; margin-top:-2px; font-size:13px;}
-  .pad-detail .k{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--text-muted); margin-bottom:5px;}
+  .pad-detail .k{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--text-muted); margin:8px 0 5px;}
+  .pad-detail .k:first-child{margin-top:0;}
   .pad-detail .chips{display:flex; flex-wrap:wrap; gap:6px;}
   .pad-detail .chip{background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px 10px; font-size:12px;}
   .pad-detail .chip.linkable{color:var(--accent); cursor:pointer; border-color:var(--accent);}
 
-  /* --- Page espèce --- */
+  .tide-now{display:flex; align-items:center; gap:10px; margin:6px 0;}
+  .tide-state{font-family:'Fraunces', serif; font-weight:600; font-size:15px; color:var(--accent);}
+  .tide-next{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted);}
+  .tide-curve{width:100%; height:52px; margin-top:6px;}
+
+  .brief-box{background:var(--surface); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:11px 12px; margin-top:8px; font-size:12.8px; line-height:1.55; white-space:pre-wrap;}
+  .brief-box .obs-ref{color:var(--accent); font-family:'IBM Plex Mono', monospace; font-size:11px;}
+
+  .session-btn{display:block; width:100%; text-align:center; background:var(--surface); border:1px solid var(--accent); color:var(--accent); border-radius:10px; padding:10px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px;}
+
+  .species-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;}
+  .species-card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 14px; cursor:pointer; text-align:center;}
+  .species-icon{width:56px; height:56px; margin:0 auto 10px; border-radius:50%;
+    background:radial-gradient(circle at 50% 40%, var(--accent) 0%, var(--accent-dim) 55%, transparent 75%);}
+  .species-card .name{font-family:'Fraunces', serif; font-weight:600; font-size:14.5px;}
+  .species-card .jp{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-top:2px;}
+  .species-card .count{font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--accent); margin-top:4px;}
+
   .section{margin-top:22px;}
   .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
     color:var(--accent); font-family:'IBM Plex Mono', monospace; margin:0 0 10px;}
 
   .fact-card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:8px; font-size:13.5px; line-height:1.5;}
-  .fact-meta{margin-top:8px; display:flex; flex-wrap:wrap; gap:6px;}
+  .fact-meta{margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
   .tag{font-family:'IBM Plex Mono', monospace; font-size:10.5px; background:var(--surface-2); color:var(--text-muted); padding:3px 7px; border-radius:6px;}
+  .conf-mini{font-family:'IBM Plex Mono', monospace; font-size:10px; padding:2px 7px; border-radius:999px; margin-left:auto;}
+  .conf-mini.high{background:rgba(95,168,122,0.18); color:var(--ok);}
+  .conf-mini.mid{background:rgba(139,151,168,0.18); color:var(--text-muted);}
+  .conf-mini.low{background:rgba(196,105,79,0.18); color:var(--flag);}
 
   .where-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
   .where-box{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px;}
@@ -92,14 +98,20 @@
   .lure-type{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted);}
   .lure-rank{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--accent); background:rgba(232,163,61,0.14); border-radius:999px; padding:2px 8px;}
 
-  /* --- QCM --- */
+  .diverge-pair{background:var(--surface); border:1px solid var(--flag); border-radius:12px; padding:12px; margin-bottom:10px;}
+  .diverge-conditions{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); margin-bottom:9px;}
+  .diverge-opt{border-left:3px solid var(--accent); padding:6px 10px; margin-bottom:7px; font-size:13px;}
+  .diverge-opt:last-child{margin-bottom:0;}
+  .diverge-opt .who{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--accent);}
+
   .qcm-cta{width:100%; background:var(--accent); color:#0F1720; border:none; border-radius:12px; padding:15px; font-size:15px; font-weight:600; cursor:pointer; margin-top:6px;}
   .qcm-panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:14px;}
   .qcm-step-label{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-bottom:10px;}
   .qcm-question{font-family:'Fraunces', serif; font-weight:600; font-size:16px; margin:0 0 14px;}
   .qcm-options{display:flex; flex-direction:column; gap:8px;}
-  .qcm-opt{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; font-size:14px; cursor:pointer; text-align:left;}
-  .qcm-opt.selected{background:var(--accent); color:#0F1720; border-color:var(--accent); font-weight:600;}
+  .qcm-opt{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:13px 14px; font-size:14px; cursor:pointer; text-align:left; color:var(--text);}
+  .qcm-opt.suggested{border-color:var(--ok);}
+  .qcm-opt.suggested::after{content:" ← calculé"; font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ok);}
   .qcm-auto{font-size:12px; color:var(--text-muted); margin-top:10px; font-family:'IBM Plex Mono', monospace;}
   .qcm-manual-input{width:100%; margin-top:8px; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:13px;}
 
@@ -108,6 +120,17 @@
   .reco-row{display:flex; gap:8px; font-size:13px; margin-bottom:5px;}
   .reco-row .k{color:var(--text-muted); font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; min-width:88px; padding-top:2px;}
   .reco-source{margin-top:10px; padding-top:9px; border-top:1px solid var(--border); font-size:11px; color:var(--text-muted);}
+
+  .log-form{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-top:12px;}
+  .log-form label{display:block; font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-muted); margin:10px 0 4px;}
+  .log-form label:first-child{margin-top:0;}
+  .log-form input, .log-form select, .log-form textarea{width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:9px 10px; font-size:13.5px; font-family:inherit;}
+  .log-form .row3{display:flex; gap:7px;}
+  .log-form .row3 button{flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:10px 4px; color:var(--text); font-size:12.5px; cursor:pointer;}
+  .log-form .row3 button.sel{background:var(--accent); color:#0F1720; border-color:var(--accent); font-weight:600;}
+  .log-save{width:100%; margin-top:12px; background:var(--accent); color:#0F1720; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:600; cursor:pointer;}
+  .log-count{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-top:8px; text-align:center;}
+  .log-export{all:unset; display:block; text-align:center; width:100%; color:var(--accent); font-size:12.5px; font-family:'IBM Plex Mono', monospace; margin-top:8px; cursor:pointer;}
 
   .empty{text-align:center; color:var(--text-muted); padding:40px 20px; font-size:13.5px;}
   .restart-btn{all:unset; cursor:pointer; color:var(--accent); font-size:13px; font-family:'IBM Plex Mono', monospace; margin-top:14px; display:inline-block;}
@@ -119,74 +142,152 @@
 <main id="mainZone"></main>
 
 <script>
+/* ============ MARÉE HARMONIQUE (M2+S2+K1+O1) ============
+   ⚠️ CONSTANTES À REMPLACER par les profils exacts de carnetjp26 (même modèle).
+   amp en cm, phase en degrés, epoch = 2026-01-01T00:00Z. La logique
+   montante/descendante/étale est indépendante des constantes exactes. */
+const TIDE_EPOCH = Date.UTC(2026,0,1);
+const OMEGA = {M2:28.9841042, S2:30.0, K1:15.0410686, O1:13.9430356}; // deg/h
+const PORTS = {
+  fukuoka:  {label:'Hakata',   M2:[60,110], S2:[30,140], K1:[25,190], O1:[20,165]},
+  itoshima: {label:'Itoshima', M2:[58,105], S2:[29,135], K1:[24,188], O1:[19,162]},
+  kobe:     {label:'Kobe',     M2:[40, 95], S2:[15,125], K1:[24,205], O1:[19,180]},
+  irago:    {label:'Irago',    M2:[70,150], S2:[30,180], K1:[23,215], O1:[18,190]},
+  numazu:   {label:'Numazu',   M2:[55,145], S2:[25,175], K1:[22,210], O1:[17,185]},
+  kashima:  {label:'Kashima',  M2:[50,130], S2:[22,160], K1:[20,200], O1:[15,175]},
+};
+const D2R = Math.PI/180;
+
+function tideHeight(portKey, date){
+  const p = PORTS[portKey]; if(!p) return 0;
+  const h = (date.getTime() - TIDE_EPOCH) / 3.6e6; // heures depuis epoch
+  let z = 0;
+  for(const c of ['M2','S2','K1','O1']){
+    const [amp, phase] = p[c];
+    z += amp * Math.cos((OMEGA[c]*h - phase) * D2R);
+  }
+  return z;
+}
+
+function tideState(portKey, date){
+  // dérivée numérique sur ±15 min ; étale si variation < 4 cm/h
+  const before = tideHeight(portKey, new Date(date.getTime() - 9e5));
+  const after  = tideHeight(portKey, new Date(date.getTime() + 9e5));
+  const rate = (after - before) / 0.5; // cm/h
+  if(Math.abs(rate) < 4) return 'étale';
+  return rate > 0 ? 'montante' : 'descendante';
+}
+
+function nextExtremes(portKey, date){
+  // échantillonne 30 min sur 26h, détecte les changements de signe de pente
+  const out = [];
+  let prev = tideHeight(portKey, date);
+  let prevSlope = null;
+  for(let m=30; m<=26*60 && out.length<2; m+=30){
+    const t = new Date(date.getTime() + m*6e4);
+    const cur = tideHeight(portKey, t);
+    const slope = cur - prev;
+    if(prevSlope !== null && Math.sign(slope) !== Math.sign(prevSlope) && Math.sign(prevSlope) !== 0){
+      out.push({type: prevSlope > 0 ? 'PM' : 'BM', time: new Date(t.getTime() - 30*6e4)});
+    }
+    prevSlope = slope; prev = cur;
+  }
+  return out;
+}
+
+function tideCurveSVG(portKey){
+  const now = new Date();
+  const pts = [];
+  let min = Infinity, max = -Infinity;
+  for(let m=-120; m<=12*60; m+=20){
+    const h = tideHeight(portKey, new Date(now.getTime() + m*6e4));
+    pts.push([m, h]); if(h<min)min=h; if(h>max)max=h;
+  }
+  const W=400, H=52, span = max-min || 1;
+  const X = m => (m+120)/(14*60)*W;
+  const Y = h => H-6 - (h-min)/span*(H-12);
+  const path = pts.map((p,i)=>`${i?'L':'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(' ');
+  const nowX = X(0);
+  return `<svg class="tide-curve" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <path d="${path}" fill="none" stroke="#E8A33D" stroke-width="1.6"/>
+    <line x1="${nowX}" y1="0" x2="${nowX}" y2="${H}" stroke="#5FA87A" stroke-width="1" stroke-dasharray="3,3"/>
+  </svg>`;
+}
+
+/* ============ ÉTAT GLOBAL ============ */
 let DATA = {species:[], observations:[], lures:[], combos:[], trip_stops:[]};
 let currentSpeciesId = null;
-let qcmState = null; // {step, answers:{}}
+let qcmState = null;
 let openStopId = null;
 let openComboName = null;
+let logResult = null;
+
+const LS_PORT = 'peche_active_port';
+const LS_SESSIONS = 'peche_sessions';
 
 const DIM_LABELS = {
-  saison:"Saison", maree:"Marée", moment_jour:"Moment de jour", spot_type:"Type de spot",
+  saison:"Saison", maree:"Marée", moment_jour:"Lumière", spot_type:"Type de spot",
   leurre:"Leurre", comportement:"Comportement", profondeur:"Profondeur",
-  temperature_eau:"Température de l'eau", couleur_eau:"Couleur de l'eau", pression_atmo:"Pression atmo"
+  temperature_eau:"Temp. eau", couleur_eau:"Couleur eau", pression_atmo:"Pression"
 };
-
+// Vocabulaire contrôlé — identique au pipeline (VOCAB)
 const QCM_STEPS = [
-  {dim:"moment_jour", question:"Quelle est la lumière ambiante ?", fallback:["Aube / crépuscule","Plein jour","Nuit"]},
-  {dim:"maree", question:"Où en est la marée ?", fallback:["Montante","Descendante","Étale"]},
-  {dim:"couleur_eau", question:"Comment est la couleur de l'eau ?", fallback:["claire","trouble","verte"]},
-  {dim:"pression_atmo", question:"Pression atmosphérique ?", auto:true, fallback:["basse","moyenne","haute"]},
+  {dim:"moment_jour", question:"Lumière ambiante ?", options:["aube","jour","crépuscule","nuit"]},
+  {dim:"maree", question:"Marée ?", options:["montante","descendante","étale"], tide:true},
+  {dim:"couleur_eau", question:"Couleur de l'eau ?", options:["claire","trouble","verte"]},
+  {dim:"pression_atmo", question:"Pression atmosphérique ?", options:["basse","moyenne","haute"], auto:true},
 ];
 
 async function loadData(){
   try{
     const res = await fetch('data.json', {cache:'no-store'});
     DATA = await res.json();
-  }catch(e){ DATA = {species:[], observations:[], lures:[], combos:[], trip_stops:[]}; }
+  }catch(e){}
   route();
-}
-
-function tidewaveSVG(h=18){
-  return `<svg class="tidewave" viewBox="0 0 400 ${h}" preserveAspectRatio="none">
-    <polyline points="0,${h*0.6},20,${h*0.25},40,${h*0.8},60,${h*0.25},80,${h*0.8},100,${h*0.25},120,${h*0.8},140,${h*0.25},160,${h*0.8},180,${h*0.25},200,${h*0.8},220,${h*0.25},240,${h*0.8},260,${h*0.25},280,${h*0.8},300,${h*0.25},320,${h*0.8},340,${h*0.25},360,${h*0.8},380,${h*0.25},400,${h*0.6}"
-      fill="none" stroke="#E8A33D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
 function route(){
   const hash = location.hash.replace('#','');
   if(hash.startsWith('species/')){
     currentSpeciesId = parseInt(hash.split('/')[1]);
-    qcmState = null;
+    qcmState = null; logResult = null;
     renderSpeciesPage();
-  } else {
-    renderHome();
-  }
+  } else { renderHome(); }
 }
 window.addEventListener('hashchange', route);
 
+function getActivePort(){ try{ return localStorage.getItem(LS_PORT); }catch(e){ return null; } }
+function setActivePort(p){ try{ p ? localStorage.setItem(LS_PORT,p) : localStorage.removeItem(LS_PORT); }catch(e){} }
+function getSessions(){ try{ return JSON.parse(localStorage.getItem(LS_SESSIONS)||'[]'); }catch(e){ return []; } }
+function saveSessions(s){ try{ localStorage.setItem(LS_SESSIONS, JSON.stringify(s)); }catch(e){} }
+
+/* ============ ACCUEIL ============ */
 function renderHome(){
+  const ap = getActivePort();
   document.getElementById('headerZone').innerHTML = `
     <p class="eyebrow">Base de connaissance</p>
     <h1>Carnet Pêche JP</h1>
-    <p class="sub">Espèces · saisons · marées · leurres</p>
-    ${tidewaveSVG()}
+    <p class="sub">${ap && PORTS[ap] ? 'Port actif : '+PORTS[ap].label+' — marée '+tideState(ap,new Date()) : 'Espèces · marées · leurres · terrain'}</p>
   `;
 
   const stopsGrid = DATA.trip_stops.map(s => `
-    <div class="pad" onclick="toggleStop(${s.id})">
+    <div class="pad ${s.port===ap?'active-port':''}" onclick="toggleStop(${s.id})">
       <div class="pad-title">${s.city}</div>
-      <div class="pad-sub">${s.dates}</div>
+      <div class="pad-sub">${s.dates}${s.port&&PORTS[s.port] ? ' · '+tideState(s.port,new Date()) : ''}</div>
     </div>
     ${openStopId === s.id ? stopDetail(s) : ''}
   `).join('');
 
-  const speciesGrid = DATA.species.map(sp => `
+  const obsCount = id => DATA.observations.filter(o=>o.species_id===id).length;
+  const speciesGrid = DATA.species
+    .filter(sp => obsCount(sp.id) > 0 || DATA.lures.some(l=>l.species_id===sp.id))
+    .map(sp => `
     <div class="species-card" onclick="location.hash='species/${sp.id}'">
       <div class="species-icon"></div>
       <div class="name">${sp.name_fr}</div>
       <div class="jp">${sp.name_jp}</div>
-    </div>
-  `).join('');
+      <div class="count">${obsCount(sp.id)} obs</div>
+    </div>`).join('');
 
   const combosGrid = DATA.combos.map(c => `
     <div class="pad" onclick="toggleCombo('${c.name}')">
@@ -196,34 +297,62 @@ function renderHome(){
     ${openComboName === c.name ? comboDetail(c) : ''}
   `).join('');
 
+  const nSessions = getSessions().length;
+
   document.getElementById('mainZone').innerHTML = `
     <div class="home-section">
       <p class="home-section-title">Où je pêche</p>
-      ${DATA.trip_stops.length ? `<div class="pad-grid">${stopsGrid}</div>` : `<div class="empty">Aucune étape renseignée pour l'instant.</div>`}
+      ${DATA.trip_stops.length ? `<div class="pad-grid">${stopsGrid}</div>` : `<div class="empty">Aucune étape.</div>`}
     </div>
-
     <div class="home-section">
-      <p class="home-section-title">Espèces</p>
-      ${DATA.species.length ? `<div class="species-grid">${speciesGrid}</div>` : `<div class="empty">Aucune espèce dans la base pour l'instant.</div>`}
+      <p class="home-section-title">Espèces documentées</p>
+      ${speciesGrid ? `<div class="species-grid">${speciesGrid}</div>` : `<div class="empty">Aucune espèce documentée pour l'instant.</div>`}
     </div>
-
     <div class="home-section">
       <p class="home-section-title">Combos</p>
-      ${DATA.combos.length ? `<div class="pad-grid">${combosGrid}</div>` : `<div class="empty">Aucun combo renseigné pour l'instant.</div>`}
+      ${DATA.combos.length ? `<div class="pad-grid">${combosGrid}</div>` : `<div class="empty">Aucun combo.</div>`}
     </div>
+    ${nSessions ? `<div class="home-section">
+      <p class="home-section-title">Terrain</p>
+      <div class="log-count">${nSessions} session(s) loggée(s) sur ce téléphone</div>
+      <button class="log-export" onclick="exportSessions()">⇩ Exporter le log (à passer dans pipeline.py import-log)</button>
+    </div>` : ''}
   `;
 }
 
 function stopDetail(s){
   const chips = s.target_species.map(name=>{
-    const sp = DATA.species.find(x=>x.name_fr.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(x.name_fr.split(' ')[0].toLowerCase()));
+    const sp = DATA.species.find(x=>x.name_fr.toLowerCase()===name.toLowerCase());
     return sp
-      ? `<span class="chip linkable" onclick="location.hash='species/${sp.id}'">${name}</span>`
+      ? `<span class="chip linkable" onclick="event.stopPropagation();location.hash='species/${sp.id}'">${name}</span>`
       : `<span class="chip">${name}</span>`;
   }).join('');
-  return `<div class="pad-detail">
+
+  let tideBlock = '';
+  if(s.port && PORTS[s.port]){
+    const state = tideState(s.port, new Date());
+    const ext = nextExtremes(s.port, new Date());
+    const fmt = d => d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    tideBlock = `
+      <div class="k">Marée — ${PORTS[s.port].label} (maintenant)</div>
+      <div class="tide-now">
+        <span class="tide-state">${state}</span>
+        <span class="tide-next">${ext.map(e=>e.type+' '+fmt(e.time)).join(' · ')}</span>
+      </div>
+      ${tideCurveSVG(s.port)}
+      <button class="session-btn" onclick="event.stopPropagation();setActivePort('${s.port}');renderHome()">Pêcher ici — activer ce port</button>`;
+  }
+
+  const briefBlock = s.brief
+    ? `<div class="k">Briefing de session</div>
+       <div class="brief-box">${s.brief.replace(/\[#(\d+)\]/g,'<span class="obs-ref">[#$1]</span>')}</div>`
+    : `<div class="k">Briefing</div><div class="tide-next">Pas encore généré — lance pipeline.py brief après avoir validé des observations.</div>`;
+
+  return `<div class="pad-detail" onclick="event.stopPropagation()">
     <div class="k">Espèces ciblées</div>
     <div class="chips">${chips || '—'}</div>
+    ${tideBlock}
+    ${briefBlock}
   </div>`;
 }
 
@@ -232,24 +361,21 @@ function toggleStop(id){ openStopId = (openStopId===id) ? null : id; renderHome(
 function comboDetail(c){
   const lures = DATA.lures.filter(l=>l.combos.includes(c.name));
   const bySpecies = {};
-  lures.forEach(l=>{
-    bySpecies[l.species_id] = bySpecies[l.species_id] || [];
-    bySpecies[l.species_id].push(l);
-  });
+  lures.forEach(l=>{ (bySpecies[l.species_id] = bySpecies[l.species_id]||[]).push(l); });
   const blocks = Object.entries(bySpecies).map(([spId, ls])=>{
     const sp = DATA.species.find(s=>s.id==spId);
-    const chips = ls.map(l=>`<span class="chip">${l.name}</span>`).join('');
-    return `<div class="k" style="margin-top:8px;">${sp?sp.name_fr:'Espèce'}</div><div class="chips">${chips}</div>`;
+    return `<div class="k">${sp?sp.name_fr:'Espèce'}</div><div class="chips">${ls.map(l=>`<span class="chip">${l.name}</span>`).join('')}</div>`;
   }).join('');
-  return `<div class="pad-detail">
-    ${blocks || '<div class="k">Aucun leurre rattaché pour l\u2019instant</div>'}
-  </div>`;
+  return `<div class="pad-detail" onclick="event.stopPropagation()">${blocks || '<div class="k">Aucun leurre rattaché</div>'}</div>`;
 }
 
 function toggleCombo(name){ openComboName = (openComboName===name) ? null : name; renderHome(); }
 
+/* ============ PAGE ESPÈCE ============ */
 function speciesObservations(id){ return DATA.observations.filter(o=>o.species_id===id); }
 function speciesLures(id){ return DATA.lures.filter(l=>l.species_id===id).sort((a,b)=>a.rank-b.rank); }
+
+function confClass(c){ return c>=0.7 ? 'high' : c>=0.5 ? 'mid' : 'low'; }
 
 function renderSpeciesPage(){
   const sp = DATA.species.find(s=>s.id===currentSpeciesId);
@@ -259,30 +385,25 @@ function renderSpeciesPage(){
     <div class="back-row">
       <button class="back-btn" onclick="location.hash=''">←</button>
       <div>
-        <p class="eyebrow">${sp.name_jp}</p>
+        <p class="eyebrow">${sp.name_jp} · ${sp.name_latin||''}</p>
         <h1 style="font-size:21px;">${sp.name_fr}</h1>
       </div>
-    </div>
-    ${tidewaveSVG(14)}
-  `;
+    </div>`;
 
   const obs = speciesObservations(sp.id);
   const behaviorObs = obs.filter(o=>!o.recommendation);
   const lures = speciesLures(sp.id);
-  const combos = [...new Set(lures.flatMap(l=>l.combos))].map(name => DATA.combos.find(c=>c.name===name)).filter(Boolean);
+  const combos = [...new Set(lures.flatMap(l=>l.combos))].map(n => DATA.combos.find(c=>c.name===n)).filter(Boolean);
   const unassigned = lures.filter(l=>l.combos.length===0);
+  const divergences = findDivergences(obs);
 
-  // Où & quand : agrégation des valeurs de tags marée / moment_jour / spot_type observées
   const whereDims = ["maree","moment_jour","spot_type"];
   const whereBoxes = whereDims.map(dim=>{
     const vals = [...new Set(obs.map(o=>o.tags[dim]).filter(Boolean))];
-    return `<div class="where-box">
-      <div class="dim-name">${DIM_LABELS[dim]}</div>
-      <div class="vals">${vals.length ? vals.join(', ') : '—'}</div>
-    </div>`;
+    return `<div class="where-box"><div class="dim-name">${DIM_LABELS[dim]}</div><div class="vals">${vals.length ? vals.join(', ') : '—'}</div></div>`;
   }).join('');
 
-  let html = `
+  document.getElementById('mainZone').innerHTML = `
     <div class="section">
       <p class="section-title">Comportement · nov. – mi-déc.</p>
       ${behaviorObs.length ? behaviorObs.map(factCard).join('') : `<div class="empty">Pas encore d'observation de comportement.</div>`}
@@ -293,23 +414,24 @@ function renderSpeciesPage(){
       <div class="where-grid">${whereBoxes}</div>
     </div>
 
+    ${divergences.length ? `<div class="section">
+      <p class="section-title">Les sources divergent</p>
+      ${divergences.map(divergeCard).join('')}
+    </div>` : ''}
+
     <div class="section">
       <p class="section-title">Top leurres (${lures.length}/10)</p>
       ${combos.map(c=>{
-        const cLures = lures.filter(l=>l.combos.includes(c.name));
+        const cl = lures.filter(l=>l.combos.includes(c.name));
         return `<div class="combo-block">
-          <div class="combo-header">
-            <span class="combo-name">${c.name}</span>
-            <span class="combo-desc">${c.description||''}</span>
-          </div>
-          ${cLures.map(lureRow).join('')}
+          <div class="combo-header"><span class="combo-name">${c.name}</span><span class="combo-desc">${c.description||''}</span></div>
+          ${cl.map(lureRow).join('')}
         </div>`;
       }).join('')}
       ${unassigned.length ? `<div class="combo-block">
-        <div class="combo-header"><span class="combo-name" style="color:var(--text-muted)">Autres leurres</span></div>
-        ${unassigned.map(lureRow).join('')}
-      </div>` : ''}
-      ${!lures.length ? `<div class="empty">Aucun leurre renseigné pour l'instant.</div>` : ''}
+        <div class="combo-header"><span class="combo-name" style="color:var(--text-muted)">Autres</span></div>
+        ${unassigned.map(lureRow).join('')}</div>` : ''}
+      ${!lures.length ? `<div class="empty">Aucun leurre renseigné.</div>` : ''}
     </div>
 
     <div class="section">
@@ -317,88 +439,111 @@ function renderSpeciesPage(){
       <button class="qcm-cta" onclick="startQCM()">Trouver la config adaptée →</button>
       <div id="qcmZone"></div>
     </div>
+
+    <div class="section">
+      <p class="section-title">Logger une session</p>
+      <div id="logZone">${logFormHTML(sp)}</div>
+    </div>
   `;
-  document.getElementById('mainZone').innerHTML = html;
 }
 
 function factCard(o){
-  const tags = Object.entries(o.tags||{}).map(([dim,val])=>`<span class="tag">${DIM_LABELS[dim]||dim}: ${val}</span>`).join('');
-  return `<div class="fact-card">
-    ${o.text}
-    <div class="fact-meta">${tags}</div>
+  const tags = Object.entries(o.tags||{}).map(([d,v])=>`<span class="tag">${DIM_LABELS[d]||d}: ${v}</span>`).join('');
+  return `<div class="fact-card">${o.text}
+    <div class="fact-meta">${tags}<span class="conf-mini ${confClass(o.confidence)}">${o.confidence.toFixed(2)} · ${o.source}</span></div>
   </div>`;
 }
 
 function lureRow(l){
   return `<div class="lure-row">
     <div><div class="lure-name">${l.name}</div><div class="lure-type">${l.type||''}</div></div>
-    <span class="lure-rank">#${l.rank}</span>
+    <span class="lure-rank">#${l.rank}</span></div>`;
+}
+
+/* Désaccords : mêmes conditions (≥2 tags partagés parmi les dims de condition), recos différentes */
+const COND_DIMS = ["maree","moment_jour","couleur_eau","spot_type","saison","pression_atmo"];
+function findDivergences(obs){
+  const recos = obs.filter(o=>o.recommendation && o.recommendation.lure);
+  const pairs = [];
+  for(let i=0;i<recos.length;i++){
+    for(let j=i+1;j<recos.length;j++){
+      const a=recos[i], b=recos[j];
+      if(a.source === b.source) continue;
+      const shared = COND_DIMS.filter(d=>a.tags[d] && a.tags[d]===b.tags[d]);
+      if(shared.length>=2 && a.recommendation.lure !== b.recommendation.lure){
+        pairs.push({a,b,shared});
+      }
+    }
+  }
+  return pairs;
+}
+
+function divergeCard(p){
+  const conds = p.shared.map(d=>`${DIM_LABELS[d]}: ${p.a.tags[d]}`).join(' · ');
+  const opt = o => `<div class="diverge-opt">
+    <div class="who">${o.source} (conf ${o.confidence.toFixed(2)})</div>
+    ${o.recommendation.lure}${o.recommendation.animation?' — '+o.recommendation.animation:''}${o.recommendation.color?' — '+o.recommendation.color:''}
+  </div>`;
+  return `<div class="diverge-pair">
+    <div class="diverge-conditions">Mêmes conditions : ${conds}</div>
+    ${opt(p.a)}${opt(p.b)}
   </div>`;
 }
 
-/* ---------------- QCM ---------------- */
-
-function startQCM(){
-  qcmState = {step:0, answers:{}};
-  renderQCM();
-}
-
-function availableOptions(dim){
-  const obs = speciesObservations(currentSpeciesId);
-  const vals = [...new Set(obs.map(o=>o.tags[dim]).filter(Boolean))];
-  return vals.length ? vals : null;
-}
+/* ============ QCM ============ */
+function startQCM(){ qcmState = {step:0, answers:{}}; renderQCM(); }
 
 async function fetchPressure(){
   const zone = document.getElementById('qcmZone');
-  zone.querySelector('.qcm-auto').textContent = 'Relevé en cours…';
+  const note = zone.querySelector('.qcm-auto');
+  if(note) note.textContent = 'Relevé en cours…';
   try{
     const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:6000}));
-    const {latitude, longitude} = pos.coords;
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=pressure_msl`);
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=pressure_msl`);
     const j = await r.json();
     const hpa = j.current.pressure_msl;
     const bucket = hpa < 1013 ? 'basse' : hpa <= 1020 ? 'moyenne' : 'haute';
-    selectQCMAnswer('pression_atmo', bucket, `${Math.round(hpa)} hPa relevés — ${bucket}`);
+    selectQCMAnswer('pression_atmo', bucket);
   }catch(e){
-    zone.querySelector('.qcm-auto').textContent = 'Relevé impossible (hors réseau ou position refusée) — choisis manuellement ci-dessous.';
+    if(note) note.textContent = 'Relevé impossible — choisis manuellement.';
   }
 }
 
 function renderQCM(){
   const zone = document.getElementById('qcmZone');
   if(!qcmState){ zone.innerHTML=''; return; }
-
-  if(qcmState.step >= QCM_STEPS.length){
-    renderQCMResults();
-    return;
-  }
+  if(qcmState.step >= QCM_STEPS.length){ renderQCMResults(); return; }
 
   const step = QCM_STEPS[qcmState.step];
-  const opts = availableOptions(step.dim) || step.fallback;
+  let suggestion = null, note = '';
 
-  let extra = '';
+  if(step.tide){
+    const ap = getActivePort();
+    if(ap && PORTS[ap]){
+      suggestion = tideState(ap, new Date());
+      note = `<div class="qcm-auto">Calculé — ${PORTS[ap].label}, maintenant. Tape une autre option pour corriger.</div>`;
+    } else {
+      note = `<div class="qcm-auto">Astuce : active un port depuis un pad "Où je pêche" pour un calcul auto.</div>`;
+    }
+  }
   if(step.auto){
-    extra = `<div class="qcm-auto">Relevé automatique via Open-Meteo…</div>
-      <input class="qcm-manual-input" placeholder="ou tape une valeur manuelle (basse / moyenne / haute)"
-        onkeydown="if(event.key==='Enter') selectQCMAnswer('pression_atmo', this.value.trim())">`;
+    note = `<div class="qcm-auto">Relevé auto via Open-Meteo…</div>`;
   }
 
-  zone.innerHTML = `
-    <div class="qcm-panel">
-      <div class="qcm-step-label">Étape ${qcmState.step+1} / ${QCM_STEPS.length}</div>
-      <p class="qcm-question">${step.question}</p>
-      <div class="qcm-options">
-        ${opts.map(o=>`<button class="qcm-opt" onclick="selectQCMAnswer('${step.dim}', this.textContent)">${o}</button>`).join('')}
-      </div>
-      ${extra}
+  zone.innerHTML = `<div class="qcm-panel">
+    <div class="qcm-step-label">Étape ${qcmState.step+1} / ${QCM_STEPS.length}</div>
+    <p class="qcm-question">${step.question}</p>
+    <div class="qcm-options">
+      ${step.options.map(o=>`<button class="qcm-opt ${o===suggestion?'suggested':''}" onclick="selectQCMAnswer('${step.dim}','${o}')">${o}</button>`).join('')}
     </div>
-  `;
+    ${note}
+  </div>`;
 
   if(step.auto) fetchPressure();
 }
 
-function selectQCMAnswer(dim, value, note){
+function selectQCMAnswer(dim, value){
+  if(!qcmState) return;
   qcmState.answers[dim] = value.toLowerCase();
   qcmState.step += 1;
   renderQCM();
@@ -409,42 +554,90 @@ function renderQCMResults(){
   const answers = qcmState.answers;
   const scored = obs.map(o=>{
     let matches = 0;
-    Object.entries(answers).forEach(([dim,val])=>{
-      if(o.tags[dim] && o.tags[dim].toLowerCase() === val) matches++;
-    });
+    Object.entries(answers).forEach(([d,v])=>{ if(o.tags[d] && o.tags[d].toLowerCase()===v) matches++; });
     return {o, matches};
-  }).filter(r=>r.matches > 0).sort((a,b)=> b.matches - a.matches || b.o.confidence - a.o.confidence);
+  }).filter(r=>r.matches>0).sort((a,b)=> b.matches-a.matches || b.o.confidence-a.o.confidence);
 
   const zone = document.getElementById('qcmZone');
+  const condLine = Object.entries(answers).map(([d,v])=>`${DIM_LABELS[d]||d}=${v}`).join(' · ');
   if(!scored.length){
     zone.innerHTML = `<div class="qcm-panel">
-      <div class="empty">Pas de recommandation source pour cette combinaison précise pour l'instant.<br>Réfère-toi au top leurres ci-dessus en attendant d'avoir plus de données.</div>
-      <span class="restart-btn" onclick="startQCM()">↺ Refaire le QCM</span>
-    </div>`;
+      <div class="qcm-step-label">${condLine}</div>
+      <div class="empty">Pas de recommandation sourcée pour cette combinaison.<br>Réfère-toi au top leurres — et logge ta session : elle deviendra la première source terrain pour ces conditions.</div>
+      <span class="restart-btn" onclick="startQCM()">↺ Refaire</span></div>`;
     return;
   }
+  zone.innerHTML = `<div class="qcm-panel">
+    <p class="qcm-step-label">${condLine}</p>
+    ${scored.map(({o,matches})=>`
+      <div class="reco-card">
+        <div class="reco-lure">${o.recommendation.lure||'Config'} <span style="font-size:11px;color:var(--text-muted)">(${matches} critère${matches>1?'s':''} matché${matches>1?'s':''})</span></div>
+        ${o.recommendation.color?`<div class="reco-row"><span class="k">Couleur</span>${o.recommendation.color}</div>`:''}
+        ${o.recommendation.animation?`<div class="reco-row"><span class="k">Animation</span>${o.recommendation.animation}</div>`:''}
+        ${o.recommendation.leader?`<div class="reco-row"><span class="k">Bas de ligne</span>${o.recommendation.leader}</div>`:''}
+        <div class="reco-source">${o.source} (${o.source_type}) · confiance ${o.confidence}</div>
+      </div>`).join('')}
+    <span class="restart-btn" onclick="startQCM()">↺ Refaire</span></div>`;
+}
 
-  zone.innerHTML = `
-    <div class="qcm-panel">
-      <p class="qcm-step-label">Résultat pour : ${Object.entries(answers).map(([d,v])=>`${DIM_LABELS[d]||d}=${v}`).join(' · ')}</p>
-      ${scored.map(({o})=>`
-        <div class="reco-card">
-          <div class="reco-lure">${o.recommendation.lure||'Config recommandée'}</div>
-          ${o.recommendation.color?`<div class="reco-row"><span class="k">Couleur</span>${o.recommendation.color}</div>`:''}
-          ${o.recommendation.animation?`<div class="reco-row"><span class="k">Animation</span>${o.recommendation.animation}</div>`:''}
-          ${o.recommendation.leader?`<div class="reco-row"><span class="k">Bas de ligne</span>${o.recommendation.leader}</div>`:''}
-          <div class="reco-source">${o.source} (${o.source_type}) · confiance ${o.confidence}</div>
-        </div>
-      `).join('')}
-      <span class="restart-btn" onclick="startQCM()">↺ Refaire le QCM</span>
+/* ============ LOG TERRAIN ============ */
+function logFormHTML(sp){
+  const last = qcmState && qcmState.answers ? qcmState.answers : {};
+  const condNote = Object.keys(last).length
+    ? `Conditions reprises du QCM : ${Object.entries(last).map(([d,v])=>`${DIM_LABELS[d]}=${v}`).join(' · ')}`
+    : 'Fais le QCM d\u2019abord pour capturer les conditions automatiquement (sinon la session part sans conditions).';
+  return `<div class="log-form">
+    <label>Leurre utilisé</label>
+    <input id="logLure" placeholder="ex: Jerkbait 120mm coulant, ormeau">
+    <label>Résultat</label>
+    <div class="row3">
+      <button onclick="setLogResult(this,'prise')">Prise</button>
+      <button onclick="setLogResult(this,'suivi')">Suivi/raté</button>
+      <button onclick="setLogResult(this,'rien')">Rien</button>
     </div>
-  `;
+    <label>Notes (taille, comportement, spot précis…)</label>
+    <textarea id="logNotes" rows="2"></textarea>
+    <div class="qcm-auto" style="margin-top:8px">${condNote}</div>
+    <button class="log-save" onclick="saveLog('${sp.name_fr}')">Enregistrer la session</button>
+    <div class="log-count">${getSessions().length} session(s) en mémoire locale</div>
+  </div>`;
+}
+
+function setLogResult(btn, val){
+  logResult = val;
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function saveLog(speciesName){
+  const lure = document.getElementById('logLure').value.trim();
+  if(!lure || !logResult){ alert('Leurre + résultat obligatoires.'); return; }
+  const sessions = getSessions();
+  sessions.push({
+    date: new Date().toISOString().slice(0,16).replace('T',' '),
+    species: speciesName.toLowerCase(),
+    conditions: (qcmState && qcmState.answers) ? qcmState.answers : {},
+    port: getActivePort() || null,
+    lure, result: logResult,
+    notes: document.getElementById('logNotes').value.trim(),
+  });
+  saveSessions(sessions);
+  logResult = null;
+  const sp = DATA.species.find(s=>s.id===currentSpeciesId);
+  document.getElementById('logZone').innerHTML = logFormHTML(sp);
+}
+
+function exportSessions(){
+  const data = JSON.stringify(getSessions(), null, 2);
+  const a = document.createElement('a');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(data);
+  a.download = 'sessions-terrain.json';
+  a.click();
 }
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
-
 loadData();
 </script>
 </body>

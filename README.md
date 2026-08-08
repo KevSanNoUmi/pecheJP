@@ -1,64 +1,65 @@
-# Carnet Pêche JP
+# Carnet Pêche JP — v3
 
 Base de connaissance pêche Japon (scraping blogs/sites spécialisés + transcriptions
-vidéos), consultable en PWA installable sur téléphone.
+vidéos + sessions terrain), consultable en PWA installable. Outil de décision, pas
+juste de consultation : conditions du moment → config sourcée.
 
-## Structure
+## Nouveautés v3
 
-- `index.html`, `manifest.json`, `sw.js`, `data.json`, `icon-*.png`, `apple-touch-icon.png`
-  → l'app (PWA, hébergée sur GitHub Pages)
-- `pipeline.py`, `schema.sql`
-  → pipeline local d'extraction (texte/transcription → SQLite → data.json)
-- `peche_jp.db`
-  → base de travail locale, **jamais versionnée** (voir `.gitignore`)
+- **Pipeline multi-espèces** : les 10 espèces du voyage (Hirame, Suzuki, Hamachi,
+  Aori-Ika, Kurodai, Madai, Tachiuo, Saba, Aji, Mebaru). Un seul texte peut nourrir
+  plusieurs fiches. Textes japonais BRUTS acceptés (pas besoin de traduire avant).
+- **Score de concordance corrigé** : une source distincte confirme dès 2 tags
+  partagés sur la même espèce (+0.15/source, plafonné +0.45).
+- **Vocabulaire contrôlé sur les 4 dimensions du QCM** (maree, moment_jour,
+  couleur_eau, pression_atmo) — imposé au LLM, vérifié à l'insertion (tag hors
+  vocab = rejeté avec message).
+- **Marée harmonique offline** (M2+S2+K1+O1) par port : état montante/descendante/
+  étale calculé en direct, prochaines PM/BM, courbe 14h. Pré-remplit le QCM quand
+  un port est activé ("Pêcher ici" sur un pad d'étape).
+  ⚠️ Les constantes amp/phase dans PORTS (index.html) sont des placeholders
+  plausibles : REMPLACE-les par les profils exacts de carnetjp26 (même modèle).
+- **Briefings de session** : `pipeline.py brief` croise chaque étape × espèces
+  ciblées × observations validées et génère un plan de session via Claude, chaque
+  affirmation citant ses observations [#id]. Embarqué dans data.json, lisible
+  offline sur le pad de l'étape.
+- **Log terrain** : formulaire sur chaque page espèce (leurre, résultat, notes ;
+  conditions reprises du dernier QCM). Stocké en localStorage, export JSON depuis
+  l'accueil, réimporté via `pipeline.py import-log` comme source "terrain"
+  poids 1.0 — tes prises font monter les scores par concordance.
+- **Vue "Les sources divergent"** : paires d'observations aux conditions communes
+  (≥2 tags) mais recommandations différentes, affichées côte à côte avec sources.
 
-## Accueil — 3 sections
-
-1. **Où je pêche** — pads par ville/étape du voyage (dates + espèces ciblées, tap pour déplier)
-2. **Espèces** — pads par espèce → page dédiée (comportement, où/quand, top leurres, QCM)
-3. **Combos** — pads par combo canne → tap pour voir quels leurres/espèces s'y rattachent
-
-## QCM — vocabulaire contrôlé
-
-Pour que le QCM de la page espèce puisse matcher les recommandations aux
-conditions du moment, deux dimensions utilisent un vocabulaire fixe (imposé au
-LLM dans le prompt d'extraction) :
-- `couleur_eau` : claire / trouble / verte
-- `pression_atmo` : basse / moyenne / haute (bucket auto : <1013 basse, 1013–1020
-  moyenne, >1020 haute — relevé via Open-Meteo, gratuit et sans clé, géolocalisé
-  côté navigateur ; secours manuel si hors réseau)
-
-## Workflow d'enrichissement
+## Workflow complet
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
+python3 pipeline.py init
 
-# Sources et observations
+# Enrichissement (texte JP brut ok)
 python3 pipeline.py add-source
 python3 pipeline.py extract <source_id> <fichier.txt>
-python3 pipeline.py review
-python3 pipeline.py validate <observation_id>
+python3 pipeline.py review && python3 pipeline.py validate <id>
 
-# Leurres et combos (curation manuelle, max 10 leurres/espèce)
-python3 pipeline.py add-lure
-python3 pipeline.py add-combo
-python3 pipeline.py link-combo <lure_id> <combo_id>
+# Curation
+python3 pipeline.py add-lure / add-combo / link-combo <lure_id> <combo_id>
+python3 pipeline.py add-stop        # inclut la clé du port de marée
 
-# Étapes du voyage (section "Où je pêche" de l'accueil)
-python3 pipeline.py add-stop
+# Retour terrain (après export depuis la PWA)
+python3 pipeline.py import-log sessions-terrain.json
 
-# Export + mise à jour de l'app
-python3 pipeline.py export        # régénère data.json directement à la racine
-git add data.json
-git commit -m "Ajout observations — <source>"
-git push
+# Briefs + publication
+python3 pipeline.py brief            # API Claude, cite les obs [#id]
+python3 pipeline.py export           # data.json à la racine
+git add data.json && git commit -m "maj" && git push
 ```
+
+## Vocabulaire contrôlé (ne pas dériver)
+
+maree: montante/descendante/étale · moment_jour: aube/jour/crépuscule/nuit ·
+couleur_eau: claire/trouble/verte · pression_atmo: basse/moyenne/haute
+(pression : auto Open-Meteo <1013 basse, 1013–1020 moyenne, >1020 haute)
 
 ## Mise en ligne (première fois)
 
-1. Crée le repo sur GitHub (public, sans README auto-généré)
-2. `python3 pipeline.py init` pour créer `peche_jp.db` en local
-3. `git init && git add . && git commit -m "Init carnet pêche JP"`
-4. `git remote add origin <url-du-repo> && git push -u origin main`
-5. Settings → Pages → Source: branche `main`, dossier `/root`
-6. Sur le tel : ouvrir l'URL → Partager → "Sur l'écran d'accueil"
+git init → push → Settings/Pages (main, /root) → tel : Partager → écran d'accueil.

@@ -3,49 +3,136 @@
     {
       "id": 1,
       "name_jp": "ヒラメ",
-      "name_fr": "Hirame (limande japonaise)",
+      "name_fr": "Hirame",
       "name_latin": "Paralichthys olivaceus"
+    },
+    {
+      "id": 2,
+      "name_jp": "スズキ",
+      "name_fr": "Suzuki",
+      "name_latin": "Lateolabrax japonicus"
+    },
+    {
+      "id": 3,
+      "name_jp": "ハマチ",
+      "name_fr": "Hamachi",
+      "name_latin": "Seriola quinqueradiata"
+    },
+    {
+      "id": 4,
+      "name_jp": "アオリイカ",
+      "name_fr": "Aori-Ika",
+      "name_latin": "Sepioteuthis lessoniana"
+    },
+    {
+      "id": 5,
+      "name_jp": "クロダイ",
+      "name_fr": "Kurodai",
+      "name_latin": "Acanthopagrus schlegelii"
+    },
+    {
+      "id": 6,
+      "name_jp": "マダイ",
+      "name_fr": "Madai",
+      "name_latin": "Pagrus major"
+    },
+    {
+      "id": 7,
+      "name_jp": "タチウオ",
+      "name_fr": "Tachiuo",
+      "name_latin": "Trichiurus lepturus"
+    },
+    {
+      "id": 8,
+      "name_jp": "サバ",
+      "name_fr": "Saba",
+      "name_latin": "Scomber japonicus"
+    },
+    {
+      "id": 9,
+      "name_jp": "アジ",
+      "name_fr": "Aji",
+      "name_latin": "Trachurus japonicus"
+    },
+    {
+      "id": 10,
+      "name_jp": "メバル",
+      "name_fr": "Mebaru",
+      "name_latin": "Sebastes inermis"
     }
   ],
   "observations": [
     {
       "id": 1,
       "species_id": 1,
-      "species": "Hirame (limande japonaise)",
-      "text": "Le hirame chasse activement à l aube en novembre sur les plages à déferlement",
-      "confidence": 0.85,
+      "species": "Hirame",
+      "text": "Hirame actif à l'aube sur marée montante, plages à déferlement",
+      "confidence": 1.0,
       "source": "Tenryu Fishing",
       "source_type": "marque",
       "tags": {
         "saison": "novembre",
         "moment_jour": "aube",
+        "maree": "montante",
         "spot_type": "plage à déferlement",
-        "couleur_eau": "claire",
-        "maree": "montante"
+        "couleur_eau": "claire"
       },
       "recommendation": {
-        "lure": "Jerkbait 120mm",
+        "lure": "Jerkbait 120mm coulant",
         "color": "ormeau nacré",
-        "animation": "animation lente saccadée près du fond",
+        "animation": "lent saccadé près du fond",
         "leader": "fluoro 20lb"
       }
     },
     {
       "id": 2,
       "species_id": 1,
-      "species": "Hirame (limande japonaise)",
-      "text": "Comportement général: le hirame reste posé sur fond sableux, embusqué",
-      "confidence": 0.7,
-      "source": "Blog surfcasting JP",
+      "species": "Hirame",
+      "text": "Meilleure fenêtre hirame : lever du jour sur la montante, vibration si eau teintée",
+      "confidence": 0.85,
+      "source": "Blog surf JP",
       "source_type": "blog",
-      "tags": {}
+      "tags": {
+        "moment_jour": "aube",
+        "maree": "montante",
+        "couleur_eau": "trouble"
+      },
+      "recommendation": {
+        "lure": "Vibration 26g",
+        "color": "chartreuse"
+      }
+    },
+    {
+      "id": 3,
+      "species_id": 1,
+      "species": "Hirame",
+      "text": "Le soir aussi ça sort, surtout au crépuscule sur les cassures (ブレイク)",
+      "confidence": 0.7,
+      "source": "Chaîne locale",
+      "source_type": "video",
+      "tags": {
+        "moment_jour": "crépuscule",
+        "spot_type": "cassure (ブレイク)"
+      }
+    },
+    {
+      "id": 4,
+      "species_id": 2,
+      "species": "Suzuki",
+      "text": "test vocab",
+      "confidence": 0.7,
+      "source": "Blog surf JP",
+      "source_type": "blog",
+      "tags": {
+        "moment_jour": "aube"
+      }
     }
   ],
   "lures": [
     {
       "id": 1,
       "species_id": 1,
-      "name": "Jerkbait 120mm",
+      "name": "Jerkbait 120mm coulant",
       "type": "jerkbait",
       "rank": 1,
       "combos": [
@@ -55,7 +142,7 @@
     {
       "id": 2,
       "species_id": 1,
-      "name": "Vibration 90mm",
+      "name": "Vibration 26g",
       "type": "vibration",
       "rank": 2,
       "combos": [
@@ -78,56 +165,68 @@
   "trip_stops": [
     {
       "id": 1,
-      "city": "Fukuoka (canaux urbains, Naka-gawa)",
+      "city": "Fukuoka (canaux, Naka-gawa)",
       "dates": "15 nov (soir)",
+      "port": "fukuoka",
       "target_species": [
         "Suzuki",
         "Aji"
-      ]
+      ],
+      "brief": null
     },
     {
       "id": 2,
       "city": "Shikanoshima / Itoshima",
       "dates": "17 nov",
+      "port": "itoshima",
       "target_species": [
         "Kurodai",
         "Mebaru"
-      ]
+      ],
+      "brief": null
     },
     {
       "id": 3,
       "city": "Kobe / Akashi",
       "dates": "22-23 nov",
+      "port": "kobe",
       "target_species": [
         "Madai",
         "Tachiuo"
-      ]
+      ],
+      "brief": null
     },
     {
       "id": 4,
       "city": "Irago / Kamishima",
       "dates": "27-28 nov",
+      "port": "irago",
       "target_species": [
         "Hamachi",
         "Saba"
-      ]
+      ],
+      "brief": null
     },
     {
       "id": 5,
       "city": "Numazu / Izu (surf)",
       "dates": "29-30 nov",
+      "port": "numazu",
       "target_species": [
         "Hirame",
         "Aori-Ika"
-      ]
+      ],
+      "brief": "HIRAME — Fenêtre prioritaire : aube sur marée montante [#1][#2]. Spots : plages à déferlement [#1], cassures (ブレイク) en fin de journée [#3]. Leurres : jerkbait 120mm coulant, ormeau nacré, animation lente saccadée près du fond, fluoro 20lb [#1] ; si eau trouble, basculer vibration 26g chartreuse [#2]. Les sources divergent sur le crépuscule : la chaîne locale le valide [#3], pas de données marque. AORI-IKA — Aucune observation validée : pas de plan sourcé pour cette espèce sur cette étape."
     },
     {
       "id": 6,
       "city": "Kashima",
       "dates": "4 déc",
+      "port": "kashima",
       "target_species": [
         "Hirame"
-      ]
+      ],
+      "brief": null
     }
   ]
 }
