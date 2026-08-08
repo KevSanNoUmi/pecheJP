@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carnet Pêche JP</title>
+<meta name="theme-color" content="#0F1720">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1720;
+    --surface:#172233;
+    --surface-2:#1E2C40;
+    --accent:#E8A33D;
+    --accent-dim:#8A6A34;
+    --text:#EDEEF0;
+    --text-muted:#8B97A8;
+    --flag:#C4694F;
+    --border:rgba(232,163,61,0.16);
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    min-height:100vh;
+    overscroll-behavior-y:none;
+  }
+  h1,h2,.display{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    letter-spacing:-0.01em;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  header{
+    position:sticky; top:0; z-index:10;
+    padding:calc(18px + var(--safe-top)) 18px 14px;
+    background:linear-gradient(180deg, var(--bg) 60%, rgba(15,23,32,0.94));
+    border-bottom:1px solid var(--border);
+  }
+  header .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 4px;
+  }
+  header h1{
+    font-size:26px; font-weight:600; margin:0 0 2px; color:var(--text);
+  }
+  header .sub{color:var(--text-muted); font-size:13px; margin:0;}
+
+  .tidewave{
+    width:100%; height:22px; margin-top:14px; opacity:0.55;
+  }
+
+  .species-row{
+    display:flex; gap:8px; margin-top:14px; overflow-x:auto;
+    padding-bottom:2px;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  .species-row::-webkit-scrollbar{display:none;}
+  .species-pill{
+    flex:0 0 auto;
+    padding:8px 14px;
+    border-radius:999px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    font-size:13.5px; font-weight:500;
+    white-space:nowrap;
+  }
+  .species-pill.active{
+    background:var(--accent); color:#0F1720; border-color:var(--accent);
+    font-weight:600;
+  }
+
+  .filter-toggle{
+    margin-top:14px;
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 14px;
+    color:var(--text);
+    font-size:13.5px;
+  }
+  .filter-toggle button{
+    all:unset; cursor:pointer; color:var(--accent); font-weight:600; font-size:13px;
+  }
+  .active-tags{
+    display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;
+  }
+  .active-tag{
+    display:flex; align-items:center; gap:6px;
+    background:var(--surface-2); border:1px solid var(--border);
+    border-radius:999px; padding:5px 10px 5px 12px;
+    font-size:12px; font-family:'IBM Plex Mono', monospace; color:var(--accent);
+  }
+  .active-tag button{
+    all:unset; cursor:pointer; color:var(--text-muted); font-size:14px; line-height:1;
+  }
+
+  #filterPanel{
+    display:none;
+    margin-top:12px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    max-height:50vh; overflow-y:auto;
+  }
+  #filterPanel.open{display:block;}
+  .dim-group{margin-bottom:14px;}
+  .dim-group:last-child{margin-bottom:0;}
+  .dim-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:7px;
+  }
+  .dim-values{display:flex; flex-wrap:wrap; gap:6px;}
+  .val-chip{
+    padding:6px 11px; border-radius:8px;
+    background:var(--surface-2); border:1px solid var(--border);
+    color:var(--text); font-size:12.5px; cursor:pointer;
+  }
+  .val-chip.selected{
+    background:var(--accent); color:#0F1720; border-color:var(--accent); font-weight:600;
+  }
+
+  main{padding:16px 18px calc(40px + var(--safe-bottom));}
+  .result-count{
+    color:var(--text-muted); font-size:12.5px; margin:0 0 12px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:12px;
+  }
+  .card-top{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    margin-bottom:10px;
+  }
+  .card-species{
+    font-family:'Fraunces', serif; font-weight:600; font-size:15px; color:var(--text);
+  }
+  .confidence{
+    flex:0 0 auto;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600;
+    padding:3px 8px; border-radius:999px;
+    white-space:nowrap;
+  }
+  .confidence.high{background:rgba(232,163,61,0.18); color:var(--accent);}
+  .confidence.mid{background:rgba(139,151,168,0.18); color:var(--text-muted);}
+  .confidence.low{background:rgba(196,105,79,0.18); color:var(--flag);}
+
+  .card-text{font-size:14.5px; line-height:1.5; color:var(--text); margin:0 0 12px;}
+
+  .card-tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:11px;
+    background:var(--surface-2); color:var(--text-muted);
+    padding:3px 8px; border-radius:6px;
+  }
+  .tag b{color:var(--accent); font-weight:600;}
+
+  .card-source{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:11.5px; color:var(--text-muted);
+    border-top:1px solid var(--border); padding-top:9px;
+  }
+  .source-type{
+    font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.06em;
+    font-size:10px;
+  }
+
+  .empty{
+    text-align:center; color:var(--text-muted); padding:60px 20px;
+    font-size:14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Base de connaissance</p>
+  <h1>Carnet Pêche JP</h1>
+  <p class="sub">Espèces · saisons · marées · leurres — sources japonaises</p>
+
+  <svg class="tidewave" viewBox="0 0 400 22" preserveAspectRatio="none">
+    <polyline points="0,14 20,6 40,18 60,6 80,18 100,6 120,18 140,6 160,18 180,6 200,18 220,6 240,18 260,6 280,18 300,6 320,18 340,6 360,18 380,6 400,14"
+      fill="none" stroke="#E8A33D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+
+  <div class="species-row" id="speciesRow"></div>
+
+  <div class="filter-toggle">
+    <span id="filterSummary">Aucun filtre actif</span>
+    <button id="filterToggleBtn">Filtres</button>
+  </div>
+  <div class="active-tags" id="activeTags"></div>
+
+  <div id="filterPanel"></div>
+</header>
+
+<main>
+  <p class="result-count" id="resultCount"></p>
+  <div id="cardList"></div>
+</main>
+
+<script>
+let DATA = [];
+let SPECIES = [];
+let activeSpecies = null;
+let activeFilters = {}; // { dimension: value }
+
+const DIM_LABELS = {
+  saison: "Saison", maree: "Marée", moment_jour: "Moment de jour",
+  spot_type: "Type de spot", leurre: "Leurre", comportement: "Comportement",
+  profondeur: "Profondeur", temperature_eau: "Température de l'eau"
+};
+
+async function loadData(){
+  try{
+    const res = await fetch('data.json', {cache:'no-store'});
+    DATA = await res.json();
+  }catch(e){
+    DATA = [];
+  }
+  SPECIES = [...new Set(DATA.map(o => o.species))];
+  activeSpecies = SPECIES[0] || null;
+  renderSpecies();
+  renderFilterPanel();
+  render();
+}
+
+function renderSpecies(){
+  const row = document.getElementById('speciesRow');
+  row.innerHTML = SPECIES.map(sp =>
+    `<div class="species-pill ${sp===activeSpecies?'active':''}" data-sp="${sp}">${sp}</div>`
+  ).join('');
+  row.querySelectorAll('.species-pill').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      activeSpecies = el.dataset.sp;
+      activeFilters = {};
+      renderSpecies(); renderFilterPanel(); render();
+    });
+  });
+}
+
+function availableDims(){
+  const dims = {};
+  DATA.filter(o=>o.species===activeSpecies).forEach(o=>{
+    Object.entries(o.tags||{}).forEach(([dim,val])=>{
+      dims[dim] = dims[dim] || new Set();
+      dims[dim].add(val);
+    });
+  });
+  return dims;
+}
+
+function renderFilterPanel(){
+  const dims = availableDims();
+  const panel = document.getElementById('filterPanel');
+  const order = Object.keys(DIM_LABELS).filter(d=>dims[d]);
+  panel.innerHTML = order.map(dim=>{
+    const values = [...dims[dim]].sort();
+    return `<div class="dim-group">
+      <div class="dim-label">${DIM_LABELS[dim]}</div>
+      <div class="dim-values">
+        ${values.map(v=>`<div class="val-chip ${activeFilters[dim]===v?'selected':''}" data-dim="${dim}" data-val="${v}">${v}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('') || `<div class="empty" style="padding:20px;">Pas encore de tags pour cette espèce.</div>`;
+
+  panel.querySelectorAll('.val-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const {dim, val} = chip.dataset;
+      if(activeFilters[dim] === val) delete activeFilters[dim];
+      else activeFilters[dim] = val;
+      renderFilterPanel(); renderActiveTags(); render();
+    });
+  });
+}
+
+function renderActiveTags(){
+  const wrap = document.getElementById('activeTags');
+  const entries = Object.entries(activeFilters);
+  wrap.innerHTML = entries.map(([dim,val])=>
+    `<div class="active-tag">${DIM_LABELS[dim]}: ${val}<button data-dim="${dim}">✕</button></div>`
+  ).join('');
+  wrap.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      delete activeFilters[btn.dataset.dim];
+      renderFilterPanel(); renderActiveTags(); render();
+    });
+  });
+  document.getElementById('filterSummary').textContent =
+    entries.length ? `${entries.length} filtre(s) actif(s)` : 'Aucun filtre actif';
+}
+
+function confidenceClass(c){
+  if(c >= 0.7) return 'high';
+  if(c >= 0.5) return 'mid';
+  return 'low';
+}
+
+function render(){
+  const filtered = DATA.filter(o=>{
+    if(o.species !== activeSpecies) return false;
+    return Object.entries(activeFilters).every(([dim,val])=> (o.tags||{})[dim] === val);
+  });
+
+  document.getElementById('resultCount').textContent =
+    `${filtered.length} observation${filtered.length>1?'s':''}`;
+
+  const list = document.getElementById('cardList');
+  if(!filtered.length){
+    list.innerHTML = `<div class="empty">Aucune observation ne correspond à ces filtres.<br>Retire-en un pour élargir la recherche.</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(o=>{
+    const cls = confidenceClass(o.confidence);
+    const label = cls==='high' ? 'fiable' : cls==='mid' ? 'moyen' : 'à vérifier';
+    const tags = Object.entries(o.tags||{}).map(([dim,val])=>
+      `<span class="tag"><b>${DIM_LABELS[dim]||dim}</b> ${val}</span>`
+    ).join('');
+    return `<div class="card">
+      <div class="card-top">
+        <span class="card-species">${o.species}</span>
+        <span class="confidence ${cls}">${label} · ${o.confidence.toFixed(2)}</span>
+      </div>
+      <p class="card-text">${o.text}</p>
+      <div class="card-tags">${tags}</div>
+      <div class="card-source">
+        <span>${o.source}</span>
+        <span class="source-type">${o.source_type}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('filterToggleBtn').addEventListener('click', ()=>{
+  document.getElementById('filterPanel').classList.toggle('open');
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>
