@@ -103,5 +103,86 @@
     "txt": "**Crépuscule = LA fenêtre**, courte ; regain possible en pleine nuit au redémarrage du courant ou à l'arrivée d'un banc. Touches quasi toutes **au fall** (lift-and-fall) — sur un raté, remettre immédiatement en descente pour une seconde attaque. Appât monté parfaitement droit, sinon méfiance."
    }
   ]
- }
+ },
+ "mechanics": [
+  {
+   "famille": "Sinking pencil",
+   "especes": "Hirame, Suzuki, Hamachi",
+   "principe": "Leurre de **distance et de couche basse** qui se pilote par la vitesse de récupération, pas par la canne. Il travaille en roulis (balancement de queue) sur une récupération linéaire lente ; c'est la lenteur qui le rend prenant.",
+   "corr": [
+    "**Hirame** : lancer loin, descendre au fond, puis récupération **très lente** juste au-dessus — le roulis de queue fait le travail. Alterner avec des chutes horizontales et, en dernier recours, des one-pitch pour réveiller un poisson calé.",
+    "**Suzuki** : on le fait **dériver** dans le courant en gardant juste l'accroche dans l'eau, récupération minimale — présentation, pas prospection.",
+    "**Hamachi** : logique inverse, **remontée rythmée depuis le fond** (part du fond, remonte) quand les poissons sont bas ; garder la chute sous surveillance."
+   ]
+  },
+  {
+   "famille": "Souple / tête plombée",
+   "especes": "Hirame, Suzuki",
+   "principe": "Le leurre de la **précision lente près du fond**. Deux gestes selon l'humeur du poisson : récupération lente rasante (poisson à convaincre) ou stop-and-go / lift-and-fall de faible amplitude (poisson à déclencher).",
+   "corr": [
+    "**Hirame** : stop-and-go dominant, ou remontées/descentes en laissant retomber. Présentation finesse, lente et précise — c'est un poisson d'embuscade qui mange à la pause.",
+    "**Suzuki** : lift-and-fall de **faible** amplitude en rasant le fond quand il est bas ; récupération rapide avec arrêt sec au-dessus d'une cassure quand il est posté dessous."
+   ]
+  },
+  {
+   "famille": "Diving pencil",
+   "especes": "Hamachi",
+   "principe": "Leurre de **surface/sub-surface animé à la canne**, spécifiquement calé sur le hamachi. Le dosage de l'énergie du jerk est LA variable — c'est là que se joue la réaction.",
+   "corr": [
+    "Règle centrale : **short jerk contrôlé** par défaut ; passer du long jerk au short jerk dès que les poissons ne réagissent pas. Courtes tirées à plongée volontairement faible.",
+    "Sur poisson méfiant : maintenir le leurre presque sur place avec de petites animations discrètes (imiter un konoshiro affaibli).",
+    "Sur poisson actif : plongées franches ou récupération rapide (ジャカ巻き) entrecoupée de pauses. Éviter d'emprisonner des bulles (short action naturelle)."
+   ]
+  },
+  {
+   "famille": "Metal jig / blade jig",
+   "especes": "Hamachi surtout, Hirame, Kurodai",
+   "principe": "Leurre de **prospection verticale rapide**. Le geste dépend de l'étage où sont les poissons : linéaire rapide haut, one-pitch / fond→mi-eau bas. La **chute est un temps de prise** à ne jamais négliger.",
+   "corr": [
+    "**Hamachi actif haut** : compte à rebours court (≈5 s) puis fast pitch dans la couche supérieure. Blade jig en récupération linéaire rapide avec **arrêts** ponctuels — la touche vient souvent à l'arrêt.",
+    "**Hamachi bas / sans signe** : prendre le fond puis remonter en one-pitch en explorant les couches ; 20-30 tours rapides puis 2-3 tours lents pour créer une pause alimentaire.",
+    "**Sur la chute** : après un long lancer, surveiller la descente du jig ; ferrer sur toute anomalie de tension (attaque au fall).",
+    "**Kurodai / poissons de fond** : montage hybride jig + softbait en lift-and-fall, reprise de contact du fond après chaque mouvement, touche à la retombée ou au touchdown."
+   ]
+  },
+  {
+   "famille": "Vibration",
+   "especes": "Suzuki",
+   "principe": "Leurre de **réaction et de distance** pour le suzuki : atteint la cassure extérieure et provoque quand la récupération régulière ne donne rien. Vitesse rapide dominante, action serrée.",
+   "corr": [
+    "Récupération **rapide** avec arrêt marqué au-dessus d'une cassure — le suzuki posté dessous réagit à la rupture.",
+    "Quand le courant s'arrête et que l'activité tombe : abandonner le linéaire pour **jerking / lift-and-fall** afin de forcer la réaction.",
+    "Eau froide / poisson loin : lancer au-delà de la cassure, **laisser descendre** puis récupérer rapidement (c'est la séquence qui sort les gros en mars)."
+   ]
+  },
+  {
+   "famille": "Minnow / jerkbait",
+   "especes": "Hirame, Suzuki, Hamachi",
+   "principe": "Leurre de **couche haute à intermédiaire**, piloté à la vitesse. La règle transversale : **adapter la vitesse au courant** pour garder une présentation cohérente, plutôt qu'une vitesse fixe.",
+   "corr": [
+    "**Hirame** : récupération lente à très lente, un tour de manivelle toutes les 2-3 s (slow drive) pour rester longtemps au-dessus du poisson posé ; laisser tomber le leurre par moments.",
+    "**Suzuki** : présentation lente accompagnant la **dérive** du courant, dead slow dans une ligne de courant ; en rivière, digital retrieve (demi-tours) pour faire dévier le leurre puis arrêt.",
+    "**Hamachi en chasse** : lancer directement dans le boil et maintenir le leurre dans la trajectoire du banc — pas de finesse, de la présence."
+   ]
+  },
+  {
+   "famille": "Egi",
+   "especes": "Aori-Ika",
+   "principe": "Tout se pilote par le **dosage jerk / descente**. La prise a lieu à la chute ; le jerk ne sert qu'à repositionner. Moduler l'énergie selon l'activité.",
+   "corr": [
+    "**Actif** : enchaîner rapidement jerks et pauses, dart ample (repositionne vite, couvre).",
+    "**Peu actif / méfiant** : **réduire la force et le nombre de jerks, allonger la descente de ~50 %** ; animation douce à dart limité, privilégier une descente stable. C'est le levier n°1 sur calamar difficile."
+   ]
+  },
+  {
+   "famille": "Popper vs stickbait (surface)",
+   "especes": "Hamachi, Kurodai, Suzuki",
+   "principe": "Deux gestes de surface **opposés** à ne pas confondre : le **popper** frappe et éclabousse (appel sonore), le **stickbait/pencil** glisse en dog-walk (fuite visuelle). Le choix dépend de l'espèce et de l'agressivité recherchée.",
+   "corr": [
+    "**Hamachi — induction (誘い出し)** : animation de surface soutenue destinée à **faire monter** le buri de la profondeur ; geste ample et engageant, pour poisson actif ou curieux.",
+    "**Kurodai — dog walk discret** : zigzag régulier ~2 twitchs/seconde en relâchant la tension après chaque coup, petits pops avec bulles ; sur poisson qui suit sans mordre, soit ralentir/stopper net, soit au contraire **accélérer franchement** le dog walk. Récupération linéaire sans à-coups possible sur les plus méfiants.",
+    "**Règle pop discret vs puissant** : le pop puissant appelle de loin en eau agitée / poisson actif ; le pop discret (juste des bulles) sur eau calme / poisson sous pression. Le stickbait coulant, lui, se joue sur la vitesse de glisse : rapide et nerveux sur poisson en chasse, lent et ample sur poisson à convaincre."
+   ]
+  }
+ ]
 }

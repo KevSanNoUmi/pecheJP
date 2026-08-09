@@ -103,6 +103,16 @@
   .fam-count{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted);}
   .fam-meta{display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
   .fam-note{font-size:12px; color:var(--text-muted); margin:0 0 12px; font-style:italic;}
+  .mech-block{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:11px;}
+  .mech-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; gap:8px;}
+  .mech-fam{font-family:'Fraunces', serif; font-weight:600; font-size:16px; color:var(--accent);}
+  .mech-esp{font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--text-muted); text-align:right;}
+  .mech-principe{font-size:13.5px; line-height:1.55; margin-bottom:9px;}
+  .mech-principe p{margin:0;}
+  .mech-corr{margin:0; padding-left:0; list-style:none;}
+  .mech-corr li{font-size:13px; line-height:1.5; padding:6px 0 6px 14px; border-left:2px solid var(--border); margin-bottom:5px; position:relative;}
+  .mech-corr li p{margin:0;}
+  .mech-principe strong, .mech-corr strong{color:var(--text); font-weight:600;}
   .behav-block{background:var(--surface); border-left:3px solid var(--accent); border-radius:0 12px 12px 0; padding:12px 14px; margin-bottom:10px;}
   .behav-title{font-family:'Fraunces', serif; font-weight:600; font-size:15px; color:var(--accent); margin-bottom:6px;}
   .behav-txt{font-size:13.5px; line-height:1.6;}
@@ -857,24 +867,49 @@ function typoBadge(o){
   return `<div class="typo-badges">${bits.join('')}</div>${corr}`;
 }
 
-function recoPanel(obs, field, title){
+function recoPanelInner(obs, field){
   const entries = obs.filter(o=>o.recommendation && o.recommendation[field]);
-  if(!entries.length) return `<div class="section" style="margin-top:0">
-    <p class="section-title">${title}</p>
-    <div class="empty">Aucune recommandation sourcée pour l'instant.<br>Elles apparaîtront dès qu'une extraction ou une session terrain en fournit.</div></div>`;
+  if(!entries.length) return `<div class="empty">Aucune recommandation sourcée pour l'instant.<br>Elles apparaîtront dès qu'une extraction ou une session terrain en fournit.</div>`;
+  return entries.map(o=>{
+    const conds = COND_DIMS.filter(d=>o.tags[d]).map(d=>`<span class="tag">${DIM_LABELS[d]}: ${o.tags[d]}</span>`).join('');
+    return `<div class="fact-card">
+      <strong style="color:var(--accent)">${o.recommendation[field]}</strong>
+      ${o.recommendation.lure ? `<span style="color:var(--text-muted); font-size:12.5px"> — sur ${o.recommendation.lure}</span>` : ''}
+      <div class="fact-meta">${conds}<span class="conf-mini ${confClass(o.confidence)}">${o.confidence.toFixed(2)} · ${o.source}</span></div>
+    </div>`;
+  }).join('');
+}
+function recoPanel(obs, field, title){
+  const inner = recoPanelInner(obs, field);
   return `<div class="section" style="margin-top:0">
     <p class="section-title">${title}</p>
-    ${entries.map(o=>{
-      const conds = COND_DIMS.filter(d=>o.tags[d]).map(d=>`<span class="tag">${DIM_LABELS[d]}: ${o.tags[d]}</span>`).join('');
-      return `<div class="fact-card">
-        <strong style="color:var(--accent)">${o.recommendation[field]}</strong>
-        ${o.recommendation.lure ? `<span style="color:var(--text-muted); font-size:12.5px"> — sur ${o.recommendation.lure}</span>` : ''}
-        <div class="fact-meta">${conds}<span class="conf-mini ${confClass(o.confidence)}">${o.confidence.toFixed(2)} · ${o.source}</span></div>
-      </div>`;
-    }).join('')}</div>`;
+    ${inner}</div>`;
 }
 function panelCouleur(sp, obs){ return recoPanel(obs, 'color', 'Choix de la couleur — selon conditions'); }
-function panelAnimation(sp, obs){ return recoPanel(obs, 'animation', 'Animations — selon conditions'); }
+function panelAnimation(sp, obs){
+  // Mécanique de mise en action, par famille de leurre — filtrée sur les familles pertinentes pour l'espèce
+  const mech = (SYNTH.mechanics || []).filter(m => m.especes.toLowerCase().includes(sp.name_fr.toLowerCase()));
+  const mechHTML = mech.length ? mech.map(m=>`
+    <div class="mech-block">
+      <div class="mech-head">
+        <span class="mech-fam">${m.famille}</span>
+        <span class="mech-esp">${m.especes}</span>
+      </div>
+      <div class="mech-principe">${mdLite(m.principe)}</div>
+      <ul class="mech-corr">${m.corr.map(c=>`<li>${mdLite(c)}</li>`).join('')}</ul>
+    </div>`).join('') : '';
+
+  return `
+    ${mech.length ? `<div class="section" style="margin-top:0">
+      <p class="section-title">Mécanique de mise en action</p>
+      <p class="fam-note">Comment animer chaque famille selon l'activité — corrélations tirées des observations.</p>
+      ${mechHTML}
+    </div>` : ''}
+    <div class="section" ${mech.length?'':'style="margin-top:0"'}>
+      <p class="section-title">Animations observées — selon conditions</p>
+      ${recoPanelInner(obs, 'animation')}
+    </div>`;
+}
 
 /* --- Panneau 5 : synthèse (grandes lignes, générée depuis l'ensemble de la base) --- */
 function panelSynthese(sp, obs){
