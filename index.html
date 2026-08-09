@@ -103,6 +103,11 @@
   .fam-count{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted);}
   .fam-meta{display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
   .fam-note{font-size:12px; color:var(--text-muted); margin:0 0 12px; font-style:italic;}
+  .behav-block{background:var(--surface); border-left:3px solid var(--accent); border-radius:0 12px 12px 0; padding:12px 14px; margin-bottom:10px;}
+  .behav-title{font-family:'Fraunces', serif; font-weight:600; font-size:15px; color:var(--accent); margin-bottom:6px;}
+  .behav-txt{font-size:13.5px; line-height:1.6;}
+  .behav-txt p{margin:0;}
+  .behav-txt strong{color:var(--text); font-weight:600;}
 
   .ideal-win{display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 11px; margin-bottom:6px;}
   .ideal-badge{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:999px;}
@@ -757,19 +762,35 @@ function setSpeciesTab(i){
 
 /* --- Panneau 1 : comportement + où/quand --- */
 function panelComportement(sp, obs){
-  const behaviorObs = obs.filter(o=>!o.recommendation);
+  const blocks = (SYNTH.behavior && SYNTH.behavior[sp.name_fr]) || null;
   const whereDims = ["maree","moment_jour","spot_type"];
   const whereBoxes = whereDims.map(dim=>{
     const vals = [...new Set(obs.map(o=>o.tags[dim]).filter(Boolean))];
-    return `<div class="where-box"><div class="dim-name">${DIM_LABELS[dim]}</div><div class="vals">${vals.length ? vals.join(', ') : '—'}</div></div>`;
+    // spot_type peut être long : limiter aux plus fréquents
+    let show = vals;
+    if(dim==='spot_type' && vals.length>8){
+      const freq = {};
+      obs.forEach(o=>{ const v=o.tags[dim]; if(v) freq[v]=(freq[v]||0)+1; });
+      show = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]);
+    }
+    return `<div class="where-box"><div class="dim-name">${DIM_LABELS[dim]}</div><div class="vals">${show.length ? show.join(', ') : '—'}</div></div>`;
   }).join('');
+
+  const synthHTML = blocks
+    ? blocks.map(b=>`<div class="behav-block">
+        <div class="behav-title">${b.titre}</div>
+        <div class="behav-txt">${mdLite(b.txt)}</div>
+      </div>`).join('')
+    : `<div class="empty">Synthèse comportementale pas encore générée pour cette espèce.</div>`;
+
   return `
     <div class="section" style="margin-top:0">
-      <p class="section-title">Comportement · nov. – mi-déc.</p>
-      ${behaviorObs.length ? behaviorObs.map(factCard).join('') : `<div class="empty">Pas encore d'observation de comportement.</div>`}
+      <p class="section-title">Comprendre l'espèce — l'essentiel</p>
+      <p class="fam-note">Regroupements synthétisés à partir des observations, pas la liste brute.</p>
+      ${synthHTML}
     </div>
     <div class="section">
-      <p class="section-title">Où &amp; quand</p>
+      <p class="section-title">Où &amp; quand (repères)</p>
       <div class="where-grid">${whereBoxes}</div>
     </div>`;
 }

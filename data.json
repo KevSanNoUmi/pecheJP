@@ -6658,6 +6658,831 @@
     "comportement": "banc en chasse très près du rivage",
     "profondeur": "moins d'environ 10 m du bord"
    }
+  },
+  {
+   "id": 345,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "À l'aube sur le surf profond de Shichiri Mihama, les jeunes kanpachi appelés shio étaient actifs dans la partie haute de la couche d'eau. Un blade jig Jack Eye Maki Maki de 30 g récupéré rapidement a produit une touche lorsque le pêcheur a interrompu la récupération.",
+   "confidence": 0.7,
+   "source": "Hayabusa / 七里御浜",
+   "source_type": "video",
+   "tags": {
+    "moment_jour": "aube",
+    "saison": "été",
+    "spot_type": "surf profond",
+    "leurre": "jack eye maki maki 30 g",
+    "comportement": "poissons actifs dans la couche supérieure"
+   },
+   "recommendation": {
+    "lure": "blade jig de 30 g",
+    "animation": "récupération linéaire rapide avec arrêts ponctuels; surveiller particulièrement la pause"
+   }
+  },
+  {
+   "id": 346,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Sur le même surf, un blade jig ramené simplement depuis le fond a pris des shio pendant la récupération. La récupération linéaire permettait donc de couvrir la couche comprise entre le fond et la mi-eau sans animation complexe.",
+   "confidence": 0.7,
+   "source": "Hayabusa / 七里御浜",
+   "source_type": "video",
+   "tags": {
+    "leurre": "blade jig",
+    "saison": "été",
+    "spot_type": "surf profond",
+    "comportement": "poissons présents du fond à la mi-eau",
+    "profondeur": "fond à mi-eau"
+   },
+   "recommendation": {
+    "lure": "blade jig de 30 g",
+    "animation": "prendre contact avec le fond puis effectuer une récupération linéaire"
+   }
+  },
+  {
+   "id": 347,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Le guide local recherche les petites différences visibles de courant, les sorties d'eau et les changements de relief. Il explique que les shio peuvent se placer sur ces variations même lorsqu'elles paraissent très discrètes.",
+   "confidence": 0.7,
+   "source": "Hayabusa / 七里御浜",
+   "source_type": "video",
+   "tags": {
+    "saison": "été",
+    "spot_type": "surf avec sorties de courant",
+    "comportement": "poissons concentrés sur de petites variations de courant"
+   },
+   "recommendation": {
+    "animation": "faire passer le leurre dans les coutures de courant et le long des changements de relief"
+   }
+  },
+  {
+   "id": 348,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Après l'augmentation de la luminosité, les touches sont devenues plus fréquentes près du fond. Le pêcheur est passé à un metal jig Jack Eye Ace de 30 à 40 g afin de lancer loin et de prospecter toute la colonne d'eau avec des one-pitch jerks.",
+   "confidence": 0.7,
+   "source": "Hayabusa / 七里御浜",
+   "source_type": "video",
+   "tags": {
+    "saison": "été",
+    "spot_type": "surf profond",
+    "profondeur": "fond à mi-eau",
+    "leurre": "jack eye ace 30 à 40 g",
+    "comportement": "poissons descendant progressivement vers le fond"
+   },
+   "recommendation": {
+    "lure": "metal jig de 30 à 40 g",
+    "animation": "prendre le fond puis remonter en one-pitch jerk en explorant plusieurs couches"
+   }
+  },
+  {
+   "id": 349,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Avec un Jack Eye Ace de 40 g animé en one-pitch, une touche a été détectée lorsque la tension de la ligne est brusquement devenue molle pendant la redescente du leurre.",
+   "confidence": 0.7,
+   "source": "Hayabusa / 七里御浜",
+   "source_type": "video",
+   "tags": {
+    "profondeur": "près du fond",
+    "saison": "été",
+    "spot_type": "surf profond",
+    "leurre": "jack eye ace 40 g",
+    "comportement": "attaque pendant la redescente"
+   },
+   "recommendation": {
+    "lure": "metal jig de 40 g",
+    "animation": "one-pitch jerk suivi d'une chute contrôlée; ferrer lorsque la ligne se détend anormalement"
+   }
+  },
+  {
+   "id": 350,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Un montage jigging sabiki de 30 g a pris des poissons aussi bien au contact du fond qu'en surface pendant une activité de baitfish. Les attaques visaient fréquemment le petit teaser plutôt que le metal jig principal.",
+   "confidence": 0.7,
+   "source": "Hayabusa / 七里御浜",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf",
+    "saison": "été",
+    "leurre": "jigging sabiki 30 g",
+    "comportement": "sélectivité possible sur de petites proies",
+    "profondeur": "surface ou fond"
+   },
+   "recommendation": {
+    "lure": "jigging sabiki avec metal jig de 30 g",
+    "animation": "adapter la couche: descente jusqu'au fond en l'absence d'activité, ou récupération dans la couche supérieure pendant une chasse"
+   }
+  },
+  {
+   "id": 351,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Le pêcheur recommande les coloris argentés lorsque la luminosité augmente, car leur flash devient plus marqué. Cette recommandation a été donnée après le lever du soleil, lorsque les poissons devaient être recherchés sur une zone plus large.",
+   "confidence": 0.7,
+   "source": "Hayabusa / 七里御浜",
+   "source_type": "video",
+   "tags": {
+    "leurre": "metal jig",
+    "spot_type": "surf",
+    "saison": "été",
+    "comportement": "recherche de poissons dispersés"
+   },
+   "recommendation": {
+    "color": "argenté ou imitation poisson-fourrage à fort flash"
+   }
+  },
+  {
+   "id": 352,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Sur le surf de Jōban, le pêcheur recherche le hirame dans une zone où un courant de retour traverse une différence de profondeur. Il fait passer le minnow depuis la partie peu profonde vers la zone creusée et soumise au courant.",
+   "confidence": 0.7,
+   "source": "DUO / Beach Walker",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf avec courant de retour",
+    "saison": "printemps",
+    "leurre": "beach walker 135md",
+    "comportement": "hirame positionné sur une transition shallow-prof profond"
+   },
+   "recommendation": {
+    "lure": "minnow Beach Walker 135MD",
+    "animation": "récupération linéaire ou stop and go en traversant la transition de profondeur"
+   }
+  },
+  {
+   "id": 353,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Le pêcheur utilise la zone d'écume blanche pour repérer le courant de retour et cherche à faire passer le leurre dans la partie plus profonde située sous ou à côté de cette écume.",
+   "confidence": 0.7,
+   "source": "DUO / Beach Walker",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf",
+    "saison": "printemps",
+    "comportement": "poissons associés à une zone de courant et de profondeur"
+   },
+   "recommendation": {
+    "animation": "lancer dans ou à côté de l'écume puis faire traverser lentement la zone plus profonde"
+   }
+  },
+  {
+   "id": 354,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Après avoir soupçonné que les poissons se tenaient au-delà du haut-fond, le pêcheur a remplacé son minnow par un Flipper de 32 g. Un jeune yellowtail a ensuite été capturé dans la zone extérieure.",
+   "confidence": 0.7,
+   "source": "DUO / Beach Walker",
+   "source_type": "video",
+   "tags": {
+    "saison": "printemps",
+    "spot_type": "surf avec haut-fond",
+    "leurre": "flipper 32 g",
+    "comportement": "poissons actifs au-delà de la zone peu profonde"
+   },
+   "recommendation": {
+    "lure": "Flipper 32 g",
+    "animation": "long lancer au-delà du haut-fond puis récupération en contrôlant la couche"
+   }
+  },
+  {
+   "id": 355,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Lorsque le vent est devenu fort et que la distance de lancer était prioritaire, le pêcheur est passé d'un leurre de 32 g à un Flipper de 40 g.",
+   "confidence": 0.7,
+   "source": "DUO / Beach Walker",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf",
+    "saison": "printemps",
+    "leurre": "flipper 40 g",
+    "comportement": "poissons potentiellement éloignés"
+   },
+   "recommendation": {
+    "lure": "Flipper 40 g",
+    "animation": "long lancer puis prospection de la cassure extérieure"
+   }
+  },
+  {
+   "id": 356,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Lorsque de petits poissons-fourrage ont été chassés très près du bord, le pêcheur a utilisé un Flipper MB22 muni d'une palette. Le leurre a produit des touches presque immédiatement dans la chasse.",
+   "confidence": 0.7,
+   "source": "DUO / Beach Walker",
+   "source_type": "video",
+   "tags": {
+    "saison": "printemps",
+    "spot_type": "surf, zone proche du bord",
+    "leurre": "flipper mb22",
+    "comportement": "poissons en chasse sur du microbait"
+   },
+   "recommendation": {
+    "lure": "blade jig Flipper MB22",
+    "animation": "lancer devant la chasse mobile puis effectuer une récupération adaptée à sa vitesse de déplacement"
+   }
+  },
+  {
+   "id": 357,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Le pêcheur fait varier la vitesse de récupération selon la force du courant. Il ralentit ou accélère afin que le leurre conserve une présentation cohérente dans la veine d'eau plutôt que d'utiliser une vitesse fixe.",
+   "confidence": 0.7,
+   "source": "DUO / Beach Walker",
+   "source_type": "video",
+   "tags": {
+    "saison": "printemps",
+    "spot_type": "surf avec courant variable",
+    "comportement": "présentation contrôlée dans la veine d'eau"
+   },
+   "recommendation": {
+    "animation": "adapter continuellement la vitesse de récupération à la force du courant"
+   }
+  },
+  {
+   "id": 358,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Le Beach Walker 135MD et le Limber 127S sont présentés comme des options lorsque le poisson-fourrage ou les prédateurs se rapprochent du bord, tandis que les Flipper de 32 à 40 g couvrent les cassures plus éloignées.",
+   "confidence": 0.7,
+   "source": "DUO / Beach Walker",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf",
+    "saison": "printemps",
+    "comportement": "adaptation à la distance des poissons"
+   },
+   "recommendation": {
+    "lure": "minnow de 127 à 135 mm près du bord; leurre dense de 32 à 40 g au large"
+   }
+  },
+  {
+   "id": 359,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Dans une eau claire avec de petits poissons-fourrage de type haku, une vibration récupérée rapidement en stop and go a déclenché une attaque au-dessus d'une pente rocheuse proche du bord.",
+   "confidence": 0.7,
+   "source": "BlueBlue / 村岡・あずあず",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "estuaire ou rivière peu profonde",
+    "leurre": "vibration",
+    "comportement": "suzuki embusqué sous une pente rocheuse"
+   },
+   "recommendation": {
+    "lure": "vibration",
+    "animation": "récupération rapide avec arrêt au-dessus de la cassure",
+    "typology": {
+     "famille": "souple / tête plombée",
+     "densite": "heavy sinking",
+     "densite_nuance": "Sinking / lesté",
+     "longueur": null,
+     "poids": null,
+     "modele": "VJ VIBRATIONJIGHEAD (poids à préciser)",
+     "marque": "COREMAN",
+     "confiance": "Haute"
+    }
+   }
+  },
+  {
+   "id": 360,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Le pêcheur explique qu'un arrêt placé exactement au-dessus d'une cassure peut faire réagir un suzuki posté dessous, notamment lorsqu'une vibration remonte la pente.",
+   "confidence": 0.7,
+   "source": "BlueBlue / 村岡・あずあず",
+   "source_type": "video",
+   "tags": {
+    "leurre": "vibration",
+    "spot_type": "cassure rocheuse",
+    "comportement": "poisson posté sous la rupture"
+   },
+   "recommendation": {
+    "lure": "vibration",
+    "animation": "faire remonter le leurre sur la pente puis marquer un arrêt au-dessus de la cassure",
+    "typology": {
+     "famille": "souple / tête plombée",
+     "densite": "heavy sinking",
+     "densite_nuance": "Sinking / lesté",
+     "longueur": null,
+     "poids": null,
+     "modele": "VJ VIBRATIONJIGHEAD (poids à préciser)",
+     "marque": "COREMAN",
+     "confiance": "Haute"
+    }
+   }
+  },
+  {
+   "id": 361,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Dans le shallow, un leurre à palette de type Shalldus est utilisé en lancer diagonal afin de passer près du fond et le long des pierres où les suzuki et les chinu peuvent se poster.",
+   "confidence": 0.7,
+   "source": "BlueBlue / 村岡・あずあず",
+   "source_type": "video",
+   "tags": {
+    "profondeur": "faible",
+    "spot_type": "bordure rocheuse peu profonde",
+    "leurre": "blade lure",
+    "comportement": "poissons associés aux pierres et à la pente"
+   },
+   "recommendation": {
+    "lure": "Shalldus ou autre blade lure adapté au shallow",
+    "animation": "lancer en diagonale et récupérer assez lentement pour faire travailler la palette près du fond"
+   }
+  },
+  {
+   "id": 362,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Lorsque le courant s'est arrêté et que l'activité biologique a diminué, le pêcheur a conseillé d'abandonner temporairement la récupération régulière au profit de jerks ou de lift and fall afin de provoquer une réaction.",
+   "confidence": 0.7,
+   "source": "BlueBlue / 村岡・あずあず",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "estuaire",
+    "comportement": "poissons moins actifs pendant l'arrêt du courant"
+   },
+   "recommendation": {
+    "lure": "vibration ou leurre supportant les jerks",
+    "animation": "jerking, lift and fall ou animation plus irrégulière",
+    "typology": {
+     "famille": "souple / tête plombée",
+     "densite": "heavy sinking",
+     "densite_nuance": "Sinking / lesté",
+     "longueur": null,
+     "poids": null,
+     "modele": "VJ VIBRATIONJIGHEAD (poids à préciser)",
+     "marque": "COREMAN",
+     "confiance": "Haute"
+    }
+   }
+  },
+  {
+   "id": 363,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Sur un secteur comportant un chenal central plus profond, le pêcheur cherche prioritairement le milieu du chenal et ses pentes plutôt que les zones uniformément peu profondes.",
+   "confidence": 0.7,
+   "source": "BlueBlue / 村岡・あずあず",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "rivière ou estuaire",
+    "comportement": "poissons associés au chenal et aux changements de profondeur"
+   },
+   "recommendation": {
+    "animation": "faire passer le leurre dans le chenal puis sur ses pentes"
+   }
+  },
+  {
+   "id": 364,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Début mars dans la baie d'Ise, avec une température de surface annoncée autour de 10,5 à 10,6 °C et aucun baitfish visible, la prospection du shallow proche du bord n'a produit aucune touche malgré des vagues favorables en apparence.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "moment_jour": "nuit",
+    "saison": "début mars",
+    "spot_type": "zone côtière peu profonde",
+    "temperature_eau": "environ 10,5 à 10,6 °c en surface",
+    "comportement": "absence de réaction près du bord"
+   }
+  },
+  {
+   "id": 365,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Après l'échec des minnows et sinking pencils dans la zone proche, le pêcheur a utilisé une vibration Raikiri 70 pour atteindre la cassure extérieure. Il l'a laissée descendre puis l'a récupérée rapidement, ce qui a produit un gros suzuki.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "moment_jour": "nuit",
+    "saison": "début mars",
+    "spot_type": "shallow avec cassure extérieure",
+    "leurre": "vibration raikiri 70",
+    "comportement": "poisson positionné plus loin et plus profond"
+   },
+   "recommendation": {
+    "lure": "vibration Raikiri 70",
+    "animation": "lancer au-delà de la cassure, laisser descendre puis récupérer rapidement",
+    "typology": {
+     "famille": "souple / tête plombée",
+     "densite": "heavy sinking",
+     "densite_nuance": "Sinking / lesté",
+     "longueur": null,
+     "poids": null,
+     "modele": "VJ VIBRATIONJIGHEAD (poids à préciser)",
+     "marque": "COREMAN",
+     "confiance": "Haute"
+    }
+   }
+  },
+  {
+   "id": 366,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Le pêcheur considère que l'air plus doux de mars peut être trompeur, car la mer reste encore dans sa période de température minimale. Dans ce contexte, il privilégie une recherche plus profonde plutôt qu'une stratégie entièrement shallow.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "saison": "début mars",
+    "spot_type": "baie ou côte peu profonde",
+    "comportement": "poissons susceptibles de rester plus profonds",
+    "temperature_eau": "basse"
+   },
+   "recommendation": {
+    "lure": "vibration ou leurre dense permettant de rechercher la couche basse",
+    "typology": {
+     "famille": "souple / tête plombée",
+     "densite": "heavy sinking",
+     "densite_nuance": "Sinking / lesté",
+     "longueur": null,
+     "poids": null,
+     "modele": "VJ VIBRATIONJIGHEAD (poids à préciser)",
+     "marque": "COREMAN",
+     "confiance": "Haute"
+    }
+   }
+  },
+  {
+   "id": 367,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Pour les futurs épisodes de microbait printanier, le pêcheur recommande les vibrations à action serrée et les leurres à palette, dont le signal correspond mieux à de petites proies.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "saison": "printemps",
+    "spot_type": "baie ou estuaire",
+    "leurre": "vibration ou blade",
+    "comportement": "alimentation sur du microbait"
+   },
+   "recommendation": {
+    "lure": "petite vibration à action serrée ou blade lure",
+    "animation": "récupération linéaire en adaptant la vitesse à l'activité des poissons",
+    "typology": {
+     "famille": "souple / tête plombée",
+     "densite": "heavy sinking",
+     "densite_nuance": "Sinking / lesté",
+     "longueur": null,
+     "poids": null,
+     "modele": "VJ VIBRATIONJIGHEAD (poids à préciser)",
+     "marque": "COREMAN",
+     "confiance": "Haute"
+    }
+   }
+  },
+  {
+   "id": 368,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Sur le surf extrêmement homogène de Suzuka, le pêcheur recherche de très petites différences: zone où l'eau semble sortir, changement de résistance du courant et passage entre une première et une deuxième cassure.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "long surf shallow et homogène",
+    "comportement": "poissons concentrés sur de faibles variations de relief ou de courant"
+   },
+   "recommendation": {
+    "animation": "quadriller lentement chaque petite variation de courant et chaque cassure"
+   }
+  },
+  {
+   "id": 369,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "À marée basse sur Suzuka Surf, la première cassure se trouvait pratiquement au niveau où le pêcheur pouvait marcher. Il a alors concentré sa prospection sur la deuxième cassure, plus éloignée.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf très peu profond",
+    "comportement": "poissons potentiellement associés à la cassure extérieure"
+   },
+   "recommendation": {
+    "lure": "leurre suffisamment dense pour atteindre la deuxième cassure",
+    "animation": "lancer au-delà ou sur la deuxième cassure puis maintenir le leurre près du fond"
+   }
+  },
+  {
+   "id": 370,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Après une nuit sans touche, un magochi correctement piqué en bouche a été pris au lever du jour avec un Slim Assassin, sur le bord d'un petit courant de retour.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf peu profond",
+    "leurre": "slim assassin",
+    "comportement": "poisson posté sur une petite variation de courant"
+   },
+   "recommendation": {
+    "lure": "minnow Slim Assassin",
+    "animation": "faire passer le minnow le long du bord du courant de retour et de la cassure"
+   }
+  },
+  {
+   "id": 371,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "Le pêcheur suppose que le magochi chasse principalement en embuscade et poursuit peu sa proie. Il en déduit que le leurre doit passer très précisément au-dessus ou immédiatement à côté du poisson.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf",
+    "comportement": "prédateur benthique en embuscade"
+   },
+   "recommendation": {
+    "animation": "multiplier les passages précis et parallèles afin de couvrir méthodiquement le fond"
+   }
+  },
+  {
+   "id": 372,
+   "species_id": 1,
+   "species": "Hirame",
+   "text": "La capture réalisée juste après l'apparition du jour, après une nuit sans contact, suggère une possible fenêtre d'activité liée à l'augmentation de la luminosité. Cette relation reste toutefois une hypothèse isolée dans cette vidéo.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "surf",
+    "comportement": "possible augmentation de l'activité avec la lumière"
+   }
+  },
+  {
+   "id": 373,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Dans une embouchure très peu profonde, une ligne de courant s'est rapprochée jusqu'à devenir accessible. Un ZigZag Bait 120F récupéré lentement dans cette ligne a alors produit un suzuki.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "saison": "hiver",
+    "profondeur": "environ 1 m",
+    "spot_type": "embouchure peu profonde",
+    "leurre": "zigzag bait 120f",
+    "comportement": "poisson suivant une route de courant"
+   },
+   "recommendation": {
+    "lure": "ZigZag Bait 120F ou autre leurre shallow volumineux",
+    "animation": "récupération lente ou dead slow dans la ligne de courant"
+   }
+  },
+  {
+   "id": 374,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Plusieurs suzuki hivernaux ont réagi à des leurres shallow de 120 à 125 mm dans environ un mètre d'eau. Cette observation montre qu'un gros profil reste utilisable en eau froide lorsque les poissons circulent dans le shallow.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "saison": "hiver",
+    "profondeur": "environ 1 m",
+    "spot_type": "embouchure shallow",
+    "leurre": "zigzag bait 120f ou komomo sf125",
+    "comportement": "poissons circulant en faible profondeur"
+   },
+   "recommendation": {
+    "lure": "leurre shallow de 120 à 125 mm",
+    "animation": "récupération très lente"
+   }
+  },
+  {
+   "id": 375,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Le pêcheur classe personnellement les variables de sélection d'un leurre dans l'ordre suivant: silhouette, profondeur de nage, action, puis couleur.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "embouchure",
+    "comportement": "principe de sélection déclaré par un pêcheur"
+   }
+  },
+  {
+   "id": 376,
+   "species_id": 2,
+   "species": "Suzuki",
+   "text": "Les poissons capturés étaient maigres et probablement liés à la période de reproduction selon le pêcheur. Leur présence dans le shallow semblait associée à une route de déplacement et à des poissons-fourrage visibles dans le secteur.",
+   "confidence": 0.7,
+   "source": "うるめ",
+   "source_type": "video",
+   "tags": {
+    "saison": "hiver",
+    "spot_type": "embouchure",
+    "comportement": "poissons post-reproduction utilisant une route de courant"
+   },
+   "recommendation": {
+    "animation": "présentation lente dans la ligne de courant plutôt que prospection rapide de toute la zone"
+   }
+  },
+  {
+   "id": 377,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "À Owase, en l'absence initiale de chasse ou d'oiseaux actifs, le pêcheur utilise un metal jig de 40 g en prenant d'abord contact avec le fond puis en prospectant rapidement jusqu'à la mi-eau.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "côte rocheuse ou îlot",
+    "leurre": "metal jig de 40 g",
+    "comportement": "recherche de poissons bleus sans signe de surface",
+    "profondeur": "environ 10 à 15 m"
+   },
+   "recommendation": {
+    "lure": "metal jig de 40 g",
+    "animation": "descente au fond puis fast pitch du fond vers la mi-eau"
+   }
+  },
+  {
+   "id": 378,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Lorsqu'un passage de shio a été signalé, le pêcheur a compté environ cinq secondes après le lancer afin de rester dans la couche supérieure, puis a animé le jig à cadence rapide. Une touche a été obtenue dans cette couche.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "côte rocheuse",
+    "leurre": "metal jig 40 g",
+    "comportement": "shio actif dans la couche supérieure",
+    "profondeur": "surface à mi-eau"
+   },
+   "recommendation": {
+    "lure": "metal jig de 40 g",
+    "animation": "compte à rebours d'environ cinq secondes puis fast pitch dans la couche supérieure"
+   }
+  },
+  {
+   "id": 379,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Après avoir observé de très petits poissons-fourrage près de ses pieds, le pêcheur est passé d'un jig de 40 g à un modèle de 30 g à silhouette plus petite et de couleur argentée.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "côte rocheuse",
+    "leurre": "metal jig 30 g",
+    "comportement": "adaptation à un petit baitfish"
+   },
+   "recommendation": {
+    "lure": "metal jig compact de 30 g",
+    "color": "argenté imitation petit poisson-fourrage",
+    "animation": "animation rapide dans la couche où le baitfish est visible"
+   }
+  },
+  {
+   "id": 380,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Une attaque est survenue au moment où le soleil est apparu après une période moins lumineuse. Le pêcheur considère ce changement soudain de lumière comme une courte fenêtre pendant laquelle il faut continuer à lancer sans perdre de temps.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "côte rocheuse",
+    "comportement": "possible activation pendant une éclaircie"
+   },
+   "recommendation": {
+    "animation": "maintenir une prospection active pendant le changement de lumière"
+   }
+  },
+  {
+   "id": 381,
+   "species_id": 5,
+   "species": "Kurodai",
+   "text": "Lorsque les poissons bleus n'étaient pas présents, le pêcheur a transformé son metal jig en montage hybride avec un bras, des hameçons de type tai-rubber et un softbait afin de cibler les poissons de fond.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "profondeur": "fond",
+    "spot_type": "côte rocheuse",
+    "leurre": "jig hybride avec softbait",
+    "comportement": "poissons de fond associés aux roches"
+   },
+   "recommendation": {
+    "lure": "metal jig de 40 g avec bras et softbait",
+    "animation": "lift and fall en reprenant contact avec le fond après chaque mouvement"
+   }
+  },
+  {
+   "id": 382,
+   "species_id": 5,
+   "species": "Kurodai",
+   "text": "Avec le montage jig et softbait destiné aux poissons de fond, une capture est intervenue pendant la chute ou exactement au moment où le leurre touchait le fond.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "profondeur": "fond",
+    "spot_type": "fond rocheux",
+    "leurre": "jig avec softbait",
+    "comportement": "attaque pendant la chute ou au contact du fond"
+   },
+   "recommendation": {
+    "lure": "jig hybride avec softbait",
+    "animation": "soulever le montage, le laisser redescendre sous contrôle et ferrer sur tout contact ou anomalie à l'arrivée au fond"
+   }
+  },
+  {
+   "id": 383,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Le pêcheur distingue la chute libre, qui donne au jig une descente papillonnante, de la chute sous tension, qui produit une descente plus contrôlée avec un mouvement de roulis. Il alterne les deux pour rechercher la réaction des poissons.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "leurre": "metal jig",
+    "spot_type": "côte rocheuse",
+    "comportement": "réaction possible à différents comportements de chute"
+   },
+   "recommendation": {
+    "lure": "metal jig capable de papillonner à la chute",
+    "animation": "alterner free fall et tension fall en contrôlant la ligne avec les doigts"
+   }
+  },
+  {
+   "id": 384,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Lorsque les poissons bleus ne donnent aucun signe, le pêcheur ne reste pas uniquement en attente. Il exploite le fond pour les poissons de roche, puis revient immédiatement dans la couche supérieure dès qu'un passage de shio est signalé.",
+   "confidence": 0.7,
+   "source": "Pure Fishing Japan / 尾鷲",
+   "source_type": "video",
+   "tags": {
+    "spot_type": "côte rocheuse",
+    "comportement": "alternance entre poissons de passage et poissons résidents"
+   },
+   "recommendation": {
+    "lure": "metal jig polyvalent ou montage hybride jig-softbait",
+    "animation": "alterner recherche du fond et animation rapide dans la couche supérieure selon les signes biologiques"
+   }
+  },
+  {
+   "id": 385,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Un grand regroupement d'oiseaux aperçu à environ un kilomètre a déclenché un déplacement sur le surf. Les oiseaux étaient d'abord simplement posés et ne plongeaient pas; leur présence seule ne confirmait donc pas encore une chasse.",
+   "confidence": 0.7,
+   "source": "猫2匹",
+   "source_type": "video",
+   "tags": {
+    "moment_jour": "aube",
+    "spot_type": "long surf",
+    "comportement": "oiseaux présents mais initialement inactifs"
+   },
+   "recommendation": {
+    "animation": "observer le comportement des oiseaux et attendre des plongeons, du baitfish en fuite ou un véritable boil avant de conclure que les poissons sont actifs"
+   }
+  },
+  {
+   "id": 386,
+   "species_id": 3,
+   "species": "Hamachi",
+   "text": "Après une longue période sans activité, un véritable boil est apparu dans la zone du ressac. Un buri de 86 cm puis un second poisson ont été pris avec un minnow Athlete, les poissons chassant à moins d'une dizaine de mètres du bord.",
+   "confidence": 0.7,
+   "source": "猫2匹",
+   "source_type": "video",
+   "tags": {
+    "moment_jour": "aube",
+    "spot_type": "surf, zone du ressac",
+    "leurre": "minnow athlete",
+    "comportement": "banc en chasse extrêmement près du rivage"
+   },
+   "recommendation": {
+    "lure": "minnow Athlete",
+    "animation": "lancer directement dans ou devant le boil et maintenir le leurre dans la trajectoire du banc",
+    "typology": {
+     "famille": "sinking pencil",
+     "densite": "sinking",
+     "densite_nuance": null,
+     "longueur": 12,
+     "poids": 33,
+     "modele": "Athlete 12SSP",
+     "marque": "Jackson",
+     "confiance": "Haute"
+    }
+   }
   }
  ],
  "lures": [],
