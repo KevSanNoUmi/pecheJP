@@ -76,12 +76,17 @@
   .species-card.undoc .count{color:var(--text-muted);}
 
   /* Navigation par dots sur la page espèce */
-  .dot-nav{display:flex; justify-content:center; gap:22px; margin:4px 0 18px;}
+  .dot-nav{display:flex; justify-content:center; gap:14px; margin:4px 0 18px; flex-wrap:wrap;}
   .dot-item{display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;}
   .dot{width:9px; height:9px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border); transition:all .15s;}
   .dot-item.active .dot{background:var(--accent); border-color:var(--accent); box-shadow:0 0 8px rgba(232,163,61,0.5);}
   .dot-label{font-family:'IBM Plex Mono', monospace; font-size:9.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted);}
   .dot-item.active .dot-label{color:var(--accent);}
+
+  .synth-box{background:var(--surface); border-left:3px solid var(--accent); border-radius:0 12px 12px 0; padding:14px 15px; font-size:13.3px; line-height:1.6;}
+  .synth-box p{margin:0 0 11px;}
+  .synth-box p:last-child{margin-bottom:0;}
+  .synth-box strong{color:var(--accent); font-weight:600;}
 
   .section{margin-top:22px;}
   .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
@@ -232,6 +237,8 @@ function tideCurveSVG(portKey){
 
 /* ============ ÉTAT GLOBAL ============ */
 let DATA = {species:[], observations:[], lures:[], combos:[], trip_stops:[]};
+let SYNTH = {species:{}, transversals:null};
+let openSynthHome = false;
 let currentSpeciesId = null;
 let speciesTab = 0;   // 0 comportement / 1 leurres / 2 couleur / 3 animation
 let qcmState = null;
@@ -260,7 +267,17 @@ async function loadData(){
     const res = await fetch('data.json', {cache:'no-store'});
     DATA = await res.json();
   }catch(e){}
+  try{
+    const rs = await fetch('synthesis.json', {cache:'no-store'});
+    SYNTH = await rs.json();
+  }catch(e){}
   route();
+}
+
+function mdLite(s){
+  return (s||'').split(/\n\n+/).map(p=>
+    '<p>'+p.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')+'</p>'
+  ).join('');
 }
 
 function route(){
@@ -331,6 +348,16 @@ function renderHome(){
       <p class="home-section-title">Combos</p>
       ${DATA.combos.length ? `<div class="pad-grid">${combosGrid}</div>` : `<div class="empty">Aucun combo.</div>`}
     </div>
+    ${SYNTH.transversals ? `<div class="home-section">
+      <p class="home-section-title">Grandes lignes</p>
+      <div class="pad-grid">
+        <div class="pad ${openSynthHome?'open':''}" style="grid-column:1 / -1;" onclick="openSynthHome=!openSynthHome;renderHome()">
+          <div class="pad-title">Les 5 transversales — toutes espèces</div>
+          <div class="pad-sub">${SYNTH.based_on||''}</div>
+        </div>
+        ${openSynthHome ? `<div class="pad-detail" onclick="event.stopPropagation()"><div class="synth-box" style="border:none;padding:0;background:transparent;">${mdLite(SYNTH.transversals)}</div></div>` : ''}
+      </div>
+    </div>` : ''}
     ${nSessions ? `<div class="home-section">
       <p class="home-section-title">Terrain</p>
       <div class="log-count">${nSessions} session(s) loggée(s) sur ce téléphone</div>
@@ -411,7 +438,7 @@ function renderSpeciesPage(){
 
   const obs = speciesObservations(sp.id);
   const divergences = findConsensusPairs(obs);
-  const TABS = ['Comportement','Leurres','Couleur','Animation'];
+  const TABS = ['Comportement','Leurres','Couleur','Animation','Synthèse'];
 
   const dotNav = `<div class="dot-nav">
     ${TABS.map((t,i)=>`<div class="dot-item ${i===speciesTab?'active':''}" onclick="setSpeciesTab(${i})">
@@ -419,7 +446,7 @@ function renderSpeciesPage(){
     </div>`).join('')}
   </div>`;
 
-  const panels = [panelComportement, panelLeurres, panelCouleur, panelAnimation];
+  const panels = [panelComportement, panelLeurres, panelCouleur, panelAnimation, panelSynthese];
 
   document.getElementById('mainZone').innerHTML = `
     ${dotNav}
@@ -447,7 +474,7 @@ function setSpeciesTab(i){
   speciesTab = i;
   const sp = DATA.species.find(s=>s.id===currentSpeciesId);
   const obs = speciesObservations(sp.id);
-  const panels = [panelComportement, panelLeurres, panelCouleur, panelAnimation];
+  const panels = [panelComportement, panelLeurres, panelCouleur, panelAnimation, panelSynthese];
   document.getElementById('tabPanel').innerHTML = panels[i](sp, obs);
   document.querySelectorAll('.dot-item').forEach((el,idx)=>el.classList.toggle('active', idx===i));
 }
@@ -517,6 +544,18 @@ function recoPanel(obs, field, title){
 }
 function panelCouleur(sp, obs){ return recoPanel(obs, 'color', 'Choix de la couleur — selon conditions'); }
 function panelAnimation(sp, obs){ return recoPanel(obs, 'animation', 'Animations — selon conditions'); }
+
+/* --- Panneau 5 : synthèse (grandes lignes, générée depuis l'ensemble de la base) --- */
+function panelSynthese(sp, obs){
+  const txt = SYNTH.species && SYNTH.species[sp.name_fr];
+  if(!txt) return `<div class="section" style="margin-top:0">
+    <p class="section-title">Synthèse</p>
+    <div class="empty">Pas encore de synthèse pour cette espèce — elle sera générée quand la base sera assez dense.</div></div>`;
+  return `<div class="section" style="margin-top:0">
+    <p class="section-title">Synthèse — grandes lignes (${SYNTH.based_on||''})</p>
+    <div class="synth-box">${mdLite(txt)}</div>
+  </div>`;
+}
 
 function factCard(o){
   const tags = Object.entries(o.tags||{}).map(([d,v])=>`<span class="tag">${DIM_LABELS[d]||d}: ${v}</span>`).join('');
