@@ -6668,6 +6668,7 @@
    "city": "Shizuoka (surf)",
    "dates": "7 nov (soir) - 8 nov",
    "port": "numazu",
+   "arrival_date": "2026-11-07",
    "target_species": [
     "Hirame",
     "Suzuki"
@@ -6679,6 +6680,7 @@
    "city": "Fukuoka (canaux urbains, Naka-gawa)",
    "dates": "15 nov (soir)",
    "port": "fukuoka",
+   "arrival_date": "2026-11-15",
    "target_species": [
     "Suzuki",
     "Aji"
@@ -6690,6 +6692,7 @@
    "city": "Shikanoshima / Itoshima",
    "dates": "17 nov",
    "port": "itoshima",
+   "arrival_date": "2026-11-17",
    "target_species": [
     "Kurodai",
     "Mebaru"
@@ -6701,6 +6704,7 @@
    "city": "Kobe / Akashi",
    "dates": "22-23 nov",
    "port": "kobe",
+   "arrival_date": "2026-11-22",
    "target_species": [
     "Madai",
     "Tachiuo"
@@ -6712,6 +6716,7 @@
    "city": "Irago / Kamishima",
    "dates": "27-28 nov",
    "port": "irago",
+   "arrival_date": "2026-11-27",
    "target_species": [
     "Hamachi",
     "Saba"
@@ -6723,6 +6728,7 @@
    "city": "Numazu / Izu (surf)",
    "dates": "29-30 nov",
    "port": "numazu",
+   "arrival_date": "2026-11-29",
    "target_species": [
     "Hirame",
     "Aori-Ika"
@@ -6734,6 +6740,7 @@
    "city": "Tokyo (baie, canaux)",
    "dates": "2-5 déc",
    "port": "tokyo",
+   "arrival_date": "2026-12-02",
    "target_species": [
     "Suzuki",
     "Aori-Ika",
@@ -6746,6 +6753,7 @@
    "city": "Kashima",
    "dates": "4 déc",
    "port": "kashima",
+   "arrival_date": "2026-12-04",
    "target_species": [
     "Hirame"
    ],

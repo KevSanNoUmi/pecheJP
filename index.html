@@ -104,6 +104,13 @@
   .fam-meta{display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
   .fam-note{font-size:12px; color:var(--text-muted); margin:0 0 12px; font-style:italic;}
 
+  .ideal-win{display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 11px; margin-bottom:6px;}
+  .ideal-badge{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:999px;}
+  .ideal-badge.is-dawn{background:rgba(232,163,61,0.18); color:var(--accent);}
+  .ideal-badge.is-dusk{background:rgba(120,110,200,0.2); color:#9b8fd6;}
+  .ideal-tide{font-size:13px; color:var(--text);}
+  .ideal-time{margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-muted);}
+
   .section{margin-top:22px;}
   .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
     color:var(--accent); font-family:'IBM Plex Mono', monospace; margin:0 0 10px;}
@@ -195,15 +202,72 @@
 const TIDE_EPOCH = Date.UTC(2026,0,1);
 const OMEGA = {M2:28.9841042, S2:30.0, K1:15.0410686, O1:13.9430356}; // deg/h
 const PORTS = {
-  fukuoka:  {label:'Hakata',   M2:[60,110], S2:[30,140], K1:[25,190], O1:[20,165]},
-  itoshima: {label:'Itoshima', M2:[58,105], S2:[29,135], K1:[24,188], O1:[19,162]},
-  kobe:     {label:'Kobe',     M2:[40, 95], S2:[15,125], K1:[24,205], O1:[19,180]},
-  irago:    {label:'Irago',    M2:[70,150], S2:[30,180], K1:[23,215], O1:[18,190]},
-  numazu:   {label:'Numazu',   M2:[55,145], S2:[25,175], K1:[22,210], O1:[17,185]},
-  tokyo:    {label:'Tokyo',    M2:[80,155], S2:[35,185], K1:[26,220], O1:[20,195]},
-  kashima:  {label:'Kashima',  M2:[50,130], S2:[22,160], K1:[20,200], O1:[15,175]},
+  fukuoka:  {label:'Hakata',   lat:33.6, lng:130.4, M2:[60,110], S2:[30,140], K1:[25,190], O1:[20,165]},
+  itoshima: {label:'Itoshima', lat:33.6, lng:130.2, M2:[58,105], S2:[29,135], K1:[24,188], O1:[19,162]},
+  kobe:     {label:'Kobe',     lat:34.7, lng:135.2, M2:[40, 95], S2:[15,125], K1:[24,205], O1:[19,180]},
+  irago:    {label:'Irago',    lat:34.6, lng:137.0, M2:[70,150], S2:[30,180], K1:[23,215], O1:[18,190]},
+  numazu:   {label:'Numazu',   lat:35.1, lng:138.9, M2:[55,145], S2:[25,175], K1:[22,210], O1:[17,185]},
+  tokyo:    {label:'Tokyo',    lat:35.6, lng:139.8, M2:[80,155], S2:[35,185], K1:[26,220], O1:[20,195]},
+  kashima:  {label:'Kashima',  lat:36.0, lng:140.7, M2:[50,130], S2:[22,160], K1:[20,200], O1:[15,175]},
 };
 const D2R = Math.PI/180;
+
+/* Soleil : lever/coucher approché (algo NOAA simplifié) pour lat/lng/date → renvoie {sunrise, sunset} en Date locale JST.
+   Sert à croiser les fenêtres de marée avec l'aube et le crépuscule. */
+function sunTimes(lat, lng, date){
+  const rad=Math.PI/180, deg=180/Math.PI;
+  const start = new Date(Date.UTC(date.getFullYear(),0,0));
+  const day = Math.floor((date - start)/864e5);
+  const lngHour = lng/15;
+  function calc(isSunrise){
+    const t = day + ((isSunrise?6:18) - lngHour)/24;
+    const M = (0.9856*t) - 3.289;
+    let L = M + (1.916*Math.sin(M*rad)) + (0.020*Math.sin(2*M*rad)) + 282.634;
+    L=(L+360)%360;
+    let RA = deg*Math.atan(0.91764*Math.tan(L*rad));
+    RA=(RA+360)%360;
+    RA += (Math.floor(L/90)*90) - (Math.floor(RA/90)*90);
+    RA/=15;
+    const sinDec=0.39782*Math.sin(L*rad), cosDec=Math.cos(Math.asin(sinDec));
+    const zenith=90.833;
+    const cosH=(Math.cos(zenith*rad)-(sinDec*Math.sin(lat*rad)))/(cosDec*Math.cos(lat*rad));
+    if(cosH>1||cosH<-1) return null;
+    let H = isSunrise ? 360-deg*Math.acos(cosH) : deg*Math.acos(cosH);
+    H/=15;
+    const T = H + RA - (0.06571*t) - 6.622;
+    let UT=(T-lngHour)%24; UT=(UT+24)%24;
+    const d=new Date(date); d.setUTCHours(Math.floor(UT), Math.round((UT%1)*60), 0, 0);
+    return d;
+  }
+  return {sunrise:calc(true), sunset:calc(false)};
+}
+
+/* Fenêtres idéales : sur la journée `date`, croise moments de faible lumière (aube ±1h30, crépuscule ±1h30)
+   avec un mouvement de marée actif (montante ou descendante, pas l'étale). Renvoie une liste de créneaux. */
+function idealWindows(portKey, date){
+  const p = PORTS[portKey]; if(!p||p.lat==null) return [];
+  const sun = sunTimes(p.lat, p.lng, date);
+  const wins = [];
+  const zones = [];
+  if(sun.sunrise) zones.push({label:'aube', center:sun.sunrise});
+  if(sun.sunset)  zones.push({label:'crépuscule', center:sun.sunset});
+  for(const z of zones){
+    const start=new Date(z.center.getTime()-54e5), end=new Date(z.center.getTime()+54e5); // ±1h30
+    // sous-fenêtres où la marée bouge (état != étale)
+    let curStart=null, curState=null;
+    for(let t=start.getTime(); t<=end.getTime(); t+=15*6e4){
+      const st = tideState(portKey, new Date(t));
+      if(st!=='étale'){
+        if(curState!==st){ if(curStart) wins.push({light:z.label, tide:curState, from:new Date(curStart), to:new Date(t)}); curStart=t; curState=st; }
+      } else {
+        if(curStart){ wins.push({light:z.label, tide:curState, from:new Date(curStart), to:new Date(t)}); curStart=null; curState=null; }
+      }
+    }
+    if(curStart) wins.push({light:z.label, tide:curState, from:new Date(curStart), to:new Date(end.getTime())});
+  }
+  // ne garder que les fenêtres d'au moins 45 min
+  return wins.filter(w => (w.to-w.from) >= 45*6e4);
+}
 
 function tideHeight(portKey, date){
   const p = PORTS[portKey]; if(!p) return 0;
@@ -360,7 +424,7 @@ function renderHome(){
   const stopsGrid = DATA.trip_stops.map(s => `
     <div class="pad ${openStopId===s.id?'open':''} ${s.port===ap?'active-port':''}" onclick="toggleStop(${s.id})">
       <div class="pad-title">${s.city}</div>
-      <div class="pad-sub">${s.dates}${s.port&&PORTS[s.port] ? ' · '+tideState(s.port,new Date()) : ''}</div>
+      <div class="pad-sub">${s.dates}${s.port&&PORTS[s.port]&&s.arrival_date ? ' · marée ancrée à l\'arrivée' : ''}</div>
     </div>
     ${openStopId === s.id ? stopDetail(s) : ''}
   `).join('');
@@ -429,15 +493,32 @@ function stopDetail(s){
 
   let tideBlock = '';
   if(s.port && PORTS[s.port]){
-    const state = tideState(s.port, new Date());
-    const ext = nextExtremes(s.port, new Date());
+    // Ancrage sur le PREMIER JOUR sur place (arrival_date) plutôt que "maintenant"
+    const refDate = s.arrival_date ? new Date(s.arrival_date+'T09:00:00+09:00') : new Date();
+    const dateLabel = s.arrival_date
+      ? new Date(s.arrival_date+'T09:00:00+09:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})
+      : 'maintenant';
+    const ext = nextExtremes(s.port, refDate);
     const fmt = d => d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const fmtR = d => d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const wins = idealWindows(s.port, refDate);
+    const sun = sunTimes(PORTS[s.port].lat, PORTS[s.port].lng, refDate);
+
+    const winHTML = wins.length ? wins.map(w=>`
+      <div class="ideal-win">
+        <span class="ideal-badge ${w.light==='aube'?'is-dawn':'is-dusk'}">${w.light}</span>
+        <span class="ideal-tide">marée ${w.tide}</span>
+        <span class="ideal-time">${fmtR(w.from)}–${fmtR(w.to)}</span>
+      </div>`).join('') : `<div class="tide-next">Pas de croisement marée active × faible lumière ce jour-là.</div>`;
+
     tideBlock = `
-      <div class="k">Marée — ${PORTS[s.port].label} (maintenant)</div>
+      <div class="k">Marée — ${PORTS[s.port].label} · ${dateLabel} (arrivée)</div>
       <div class="tide-now">
-        <span class="tide-state">${state}</span>
         <span class="tide-next">${ext.map(e=>e.type+' '+fmt(e.time)).join(' · ')}</span>
       </div>
+      <div class="k" style="margin-top:12px">☀︎ Soleil : ${sun.sunrise?fmt(sun.sunrise):'—'} → ${sun.sunset?fmt(sun.sunset):'—'}</div>
+      <div class="k" style="margin-top:12px">Fenêtres idéales — marée active × aube/crépuscule</div>
+      ${winHTML}
       ${tideCurveSVG(s.port)}
       <button class="session-btn" onclick="event.stopPropagation();setActivePort('${s.port}');renderHome()">Pêcher ici — activer ce port</button>`;
   }
