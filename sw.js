@@ -1,6 +1,6 @@
 // Service worker — offline app shell for Carnet Pêche JP
-const CACHE = 'carnet-peche-jp-v4';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './synthesis.json', './icon-192.png', './icon-512.png'];
+const CACHE = 'carnet-peche-jp-v5';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './synthesis.json', './lure_typology.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -19,7 +19,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
 
   // data.json : réseau en priorité (données vivantes, mises à jour à chaque push), cache en secours hors ligne
-  if (url.origin === location.origin && (url.pathname.endsWith('data.json') || url.pathname.endsWith('synthesis.json'))) {
+  if (url.origin === location.origin && (url.pathname.endsWith('data.json') || url.pathname.endsWith('synthesis.json') || url.pathname.endsWith('lure_typology.json'))) {
     e.respondWith(
       fetch(req).then((res) => {
         const copy = res.clone();
