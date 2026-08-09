@@ -282,17 +282,10 @@ const DIM_LABELS = {
   temperature_eau:"Temp. eau", couleur_eau:"Couleur eau", pression_atmo:"Pression"
 };
 // Vocabulaire contrôlé — identique au pipeline (VOCAB)
-const QCM_STEPS = [
-  {dim:"moment_jour", question:"Lumière ambiante ?", options:["aube","jour","crépuscule","nuit"]},
-  {dim:"maree", question:"Marée ?", options:["montante","descendante","étale"], tide:true},
-  {dim:"couleur_eau", question:"Couleur de l'eau ?", options:["claire","trouble","verte"]},
-  {dim:"pression_atmo", question:"Pression atmosphérique ?", options:["basse","moyenne","haute"], auto:true},
-  {dim:"observation", question:"Ce que tu lis sur le spot ? (plusieurs choix possibles)", multi:true,
-   options:Object.keys(typeof OBS_PATTERNS!=='undefined'?OBS_PATTERNS:{})},
-];
 
 /* Lecture du spot : ce que le pêcheur observe (courant de surface, structure, géographie)
-   → matché par mots-clés sur spot_type + comportement + texte des observations */
+   → matché par mots-clés sur spot_type + comportement + texte des observations.
+   DÉCLARÉ AVANT QCM_STEPS car QCM_STEPS y fait référence. */
 const OBS_PATTERNS = {
   "cassure / rupture de fond":        ["rupture","cassure","ブレイク","カケ","pente","駆け上"],
   "courant de retour vers le large":  ["courant de retour","離岸流","chenal"],
@@ -303,7 +296,15 @@ const OBS_PATTERNS = {
   "fosse / creux proche du bord":     ["fosse","creux","affouill","cuvette","creusé"],
   "fourrage visible / oiseaux":       ["fourrage","bait","oiseau","sardine","iwashi","konoshiro","mulet","anchois","banc de","sayori","sappa","chasse"],
 };
-QCM_STEPS[QCM_STEPS.length-1].options = Object.keys(OBS_PATTERNS);
+
+const QCM_STEPS = [
+  {dim:"moment_jour", question:"Lumière ambiante ?", options:["aube","jour","crépuscule","nuit"]},
+  {dim:"maree", question:"Marée ?", options:["montante","descendante","étale"], tide:true},
+  {dim:"couleur_eau", question:"Couleur de l'eau ?", options:["claire","trouble","verte"]},
+  {dim:"pression_atmo", question:"Pression atmosphérique ?", options:["basse","moyenne","haute"], auto:true},
+  {dim:"observation", question:"Ce que tu lis sur le spot ? (plusieurs choix possibles)", multi:true,
+   options:Object.keys(OBS_PATTERNS)},
+];
 
 function obsMatchCategories(o, selectedCats){
   const texte = ((o.tags.spot_type||'')+' '+(o.tags.comportement||'')+' '+(o.text||'')).toLowerCase();
