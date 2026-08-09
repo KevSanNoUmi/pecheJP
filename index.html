@@ -149,10 +149,12 @@
 
   .consensus-pair{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px;}
   .consensus-pair.is-consensus{border-color:var(--ok);}
+  .consensus-pair.is-consensus-action{border-color:#5FA87A;}
   .consensus-pair.is-divergence{border-color:var(--flag);}
   .consensus-pair.is-adaptation{border-color:#5B7FA6;}
   .consensus-badge{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; padding:2px 8px; border-radius:999px; margin-bottom:8px;}
   .consensus-badge.is-consensus{background:rgba(95,168,122,0.18); color:var(--ok);}
+  .consensus-badge.is-consensus-action{background:rgba(95,168,122,0.14); color:#5FA87A;}
   .consensus-badge.is-divergence{background:rgba(196,105,79,0.18); color:var(--flag);}
   .consensus-badge.is-adaptation{background:rgba(91,127,166,0.2); color:#7FA8C9;}
 
@@ -948,6 +950,36 @@ function activityLevel(o){
   return null;
 }
 
+/* Typologie d'ACTION (ce qu'on fait une fois le leurre à l'eau) — ce qui compte vraiment à la pêche.
+   Deux leurres différents avec la même action = consensus d'animation, PAS un désaccord.
+   On classe l'animation (et le texte) dans des familles de gestes. */
+const ACTION_PATTERNS = {
+  "fond puis récupération":   ["prendre le fond","contact avec le fond","prendre contact","atteindre le fond","depuis le fond","part du fond","toucher le fond","récupér","remont","du fond"],
+  "stop-and-go / pauses":     ["stop-and-go","stop and go","arrêt","pause","stoppe","marque un temps","interrompu","séquence"],
+  "lift-and-fall / dandine":  ["lift-and-fall","lift and fall","dandine","tirée puis","soulever","relever puis","jerk puis chute","jig"],
+  "chute / fall (laisser descendre)": ["chute","fall","laisser descendre","laisser tomber","free fall","tension fall","redescendre","descente"],
+  "dérive dans le courant":   ["dériv","laisser filer","accompagner le courant","dans le courant","dérive latérale","drift"],
+  "récupération linéaire":    ["linéaire","récupération continue","récupération régulière","ramener régulièrement","récupération lente","dead slow","récupération rapide","récupération simple"],
+  "jerk / twitch (animation de canne)": ["jerk","twitch","dog walk","écart","glisse","short jerk","long jerk","animation de canne","tirées","saccad"],
+  "surface / induction":      ["surface","topwater","誘い出し","induction","wake","faire monter","sub-surface"],
+};
+
+function actionCategories(o){
+  const rec = o.recommendation || {};
+  const blob = ((rec.animation||'') + ' ' + (o.tags && o.tags.comportement || '') + ' ' + (o.text||'')).toLowerCase();
+  const cats = [];
+  for(const [cat, kws] of Object.entries(ACTION_PATTERNS)){
+    if(kws.some(k=>blob.includes(k.toLowerCase()))) cats.push(cat);
+  }
+  return cats;
+}
+function actionSim(a,b){
+  const A = new Set(actionCategories(a)), B = new Set(actionCategories(b));
+  if(!A.size || !B.size) return {shared:[], score:0};
+  const shared = [...A].filter(x=>B.has(x));
+  return {shared, score: shared.length / Math.max(A.size, B.size)};
+}
+
 function findConsensusPairs(obs){
   const recos = obs.filter(o=>o.recommendation && o.recommendation.lure);
   const pairs = [];
@@ -957,18 +989,32 @@ function findConsensusPairs(obs){
       if(a.source===b.source) continue;
       const cond = conditionMatch(a,b);
       if(!cond.related) continue;
+
       const lureSim = jaccard(a.recommendation.lure, b.recommendation.lure).score;
-      let type = lureSim>=0.25 ? 'consensus' : 'divergence';
-      let actA=null, actB=null;
-      if(type==='divergence'){
-        actA = activityLevel(a); actB = activityLevel(b);
-        if(actA && actB && actA!==actB) type = 'adaptation';
+      // Comparaison des familles de leurre via la typologie vérifiée (si dispo)
+      const famA = a.recommendation.typology && a.recommendation.typology.famille;
+      const famB = b.recommendation.typology && b.recommendation.typology.famille;
+      const sameFamille = famA && famB && famA===famB;
+      const act = actionSim(a,b);
+
+      let type, actKind=null;
+      if(lureSim>=0.25 || sameFamille){
+        type = 'consensus';                 // même leurre / même famille
+      } else if(act.shared.length){
+        type = 'consensus-action';          // leurres différents MAIS même typologie d'action
+        actKind = act.shared[0];
+      } else {
+        // vrai écart de reco → adaptation à l'activité, ou désaccord
+        const actA = activityLevel(a), actB = activityLevel(b);
+        if(actA && actB && actA!==actB){ type = 'adaptation'; pairs.push({a,b,cond,lureSim,type,actA,actB}); continue; }
+        type = 'divergence';
       }
-      pairs.push({a, b, cond, lureSim, type, actA, actB});
+      pairs.push({a, b, cond, lureSim, type, actKind, sharedActions: act.shared});
     }
   }
-  // priorité : consensus les plus solides d'abord, puis désaccords les plus pertinents
-  return pairs.sort((p,q)=> (q.cond.controlled+q.cond.text) - (p.cond.controlled+p.cond.text));
+  // ordre : consensus d'abord, puis consensus-action, puis adaptation, puis désaccords
+  const rank = {consensus:0,'consensus-action':1,adaptation:2,divergence:3};
+  return pairs.sort((p,q)=> (rank[p.type]-rank[q.type]) || ((q.cond.controlled+q.cond.text)-(p.cond.controlled+p.cond.text)));
 }
 
 function conditionLabel(pair){
@@ -981,10 +1027,14 @@ function conditionLabel(pair){
 }
 
 function consensusCard(pair){
-  const labels = {consensus:'Consensus', divergence:'Désaccord', adaptation:"Adaptation à l'activité"};
+  const labels = {consensus:'Consensus', 'consensus-action':"Consensus d'action", divergence:'Désaccord', adaptation:"Adaptation à l'activité"};
   const badge = labels[pair.type];
-  const actNote = pair.type==='adaptation'
-    ? `<div class="diverge-conditions" style="color:var(--info,#7FA8C9)">Pas une contradiction : réponses à deux états d'activité (${pair.actA} vs ${pair.actB})</div>` : '';
+  let note = '';
+  if(pair.type==='adaptation'){
+    note = `<div class="diverge-conditions" style="color:#7FA8C9">Pas une contradiction : réponses à deux états d'activité (${pair.actA} vs ${pair.actB})</div>`;
+  } else if(pair.type==='consensus-action'){
+    note = `<div class="diverge-conditions" style="color:#5FA87A">Même geste à l'eau — <strong>${pair.actKind}</strong> — avec deux leurres différents. Ce qui compte, c'est l'action, pas le modèle.</div>`;
+  }
   const opt = (o,act) => `<div class="diverge-opt">
     <div class="who">${o.source} (conf ${o.confidence.toFixed(2)})${act?` · poissons ${act}s`:''}</div>
     ${o.recommendation.lure}${o.recommendation.animation?' — '+o.recommendation.animation:''}${o.recommendation.color?' — '+o.recommendation.color:''}
@@ -992,7 +1042,7 @@ function consensusCard(pair){
   return `<div class="consensus-pair is-${pair.type}">
     <span class="consensus-badge is-${pair.type}">${badge}</span>
     <div class="diverge-conditions">${conditionLabel(pair)}</div>
-    ${actNote}
+    ${note}
     ${opt(pair.a, pair.type==='adaptation'?pair.actA:null)}${opt(pair.b, pair.type==='adaptation'?pair.actB:null)}
   </div>`;
 }
