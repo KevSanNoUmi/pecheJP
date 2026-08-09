@@ -43,9 +43,10 @@
 
   .pad-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;}
   .pad{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer;}
+  .pad.open{border-color:var(--accent); background:var(--surface-2);}
   .pad .pad-title{font-family:'Fraunces', serif; font-weight:600; font-size:14px; line-height:1.25;}
   .pad .pad-sub{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); margin-top:5px;}
-  .pad.active-port{border-color:var(--accent);}
+  .pad.active-port .pad-sub::before{content:"◉ "; color:var(--ok);}
 
   .pad-detail{grid-column:1 / -1; background:var(--surface-2); border:1px solid var(--accent); border-radius:12px; padding:13px 14px; margin-top:-2px; font-size:13px;}
   .pad-detail .k{font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; color:var(--text-muted); margin:8px 0 5px;}
@@ -71,6 +72,16 @@
   .species-card .name{font-family:'Fraunces', serif; font-weight:600; font-size:14.5px;}
   .species-card .jp{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted); margin-top:2px;}
   .species-card .count{font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--accent); margin-top:4px;}
+  .species-card.undoc{opacity:0.4;}
+  .species-card.undoc .count{color:var(--text-muted);}
+
+  /* Navigation par dots sur la page espèce */
+  .dot-nav{display:flex; justify-content:center; gap:22px; margin:4px 0 18px;}
+  .dot-item{display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--surface-2); border:1px solid var(--border); transition:all .15s;}
+  .dot-item.active .dot{background:var(--accent); border-color:var(--accent); box-shadow:0 0 8px rgba(232,163,61,0.5);}
+  .dot-label{font-family:'IBM Plex Mono', monospace; font-size:9.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted);}
+  .dot-item.active .dot-label{color:var(--accent);}
 
   .section{margin-top:22px;}
   .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
@@ -98,7 +109,12 @@
   .lure-type{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted);}
   .lure-rank{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--accent); background:rgba(232,163,61,0.14); border-radius:999px; padding:2px 8px;}
 
-  .diverge-pair{background:var(--surface); border:1px solid var(--flag); border-radius:12px; padding:12px; margin-bottom:10px;}
+  .consensus-pair{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px;}
+  .consensus-pair.is-consensus{border-color:var(--ok);}
+  .consensus-pair.is-divergence{border-color:var(--flag);}
+  .consensus-badge{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; padding:2px 8px; border-radius:999px; margin-bottom:8px;}
+  .consensus-badge.is-consensus{background:rgba(95,168,122,0.18); color:var(--ok);}
+  .consensus-badge.is-divergence{background:rgba(196,105,79,0.18); color:var(--flag);}
   .diverge-conditions{font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--text-muted); margin-bottom:9px;}
   .diverge-opt{border-left:3px solid var(--accent); padding:6px 10px; margin-bottom:7px; font-size:13px;}
   .diverge-opt:last-child{margin-bottom:0;}
@@ -217,6 +233,7 @@ function tideCurveSVG(portKey){
 /* ============ ÉTAT GLOBAL ============ */
 let DATA = {species:[], observations:[], lures:[], combos:[], trip_stops:[]};
 let currentSpeciesId = null;
+let speciesTab = 0;   // 0 comportement / 1 leurres / 2 couleur / 3 animation
 let qcmState = null;
 let openStopId = null;
 let openComboName = null;
@@ -250,7 +267,7 @@ function route(){
   const hash = location.hash.replace('#','');
   if(hash.startsWith('species/')){
     currentSpeciesId = parseInt(hash.split('/')[1]);
-    qcmState = null; logResult = null;
+    speciesTab = 0; qcmState = null; logResult = null;
     renderSpeciesPage();
   } else { renderHome(); }
 }
@@ -271,7 +288,7 @@ function renderHome(){
   `;
 
   const stopsGrid = DATA.trip_stops.map(s => `
-    <div class="pad ${s.port===ap?'active-port':''}" onclick="toggleStop(${s.id})">
+    <div class="pad ${openStopId===s.id?'open':''} ${s.port===ap?'active-port':''}" onclick="toggleStop(${s.id})">
       <div class="pad-title">${s.city}</div>
       <div class="pad-sub">${s.dates}${s.port&&PORTS[s.port] ? ' · '+tideState(s.port,new Date()) : ''}</div>
     </div>
@@ -279,18 +296,20 @@ function renderHome(){
   `).join('');
 
   const obsCount = id => DATA.observations.filter(o=>o.species_id===id).length;
-  const speciesGrid = DATA.species
-    .filter(sp => obsCount(sp.id) > 0 || DATA.lures.some(l=>l.species_id===sp.id))
-    .map(sp => `
-    <div class="species-card" onclick="location.hash='species/${sp.id}'">
+  const speciesGrid = DATA.species.map(sp => {
+    const n = obsCount(sp.id);
+    const doc = n > 0 || DATA.lures.some(l=>l.species_id===sp.id);
+    return `
+    <div class="species-card ${doc?'':'undoc'}" onclick="location.hash='species/${sp.id}'">
       <div class="species-icon"></div>
       <div class="name">${sp.name_fr}</div>
       <div class="jp">${sp.name_jp}</div>
-      <div class="count">${obsCount(sp.id)} obs</div>
-    </div>`).join('');
+      <div class="count">${n ? n+' obs' : 'non documentée'}</div>
+    </div>`;
+  }).join('');
 
   const combosGrid = DATA.combos.map(c => `
-    <div class="pad" onclick="toggleCombo('${c.name}')">
+    <div class="pad ${openComboName===c.name?'open':''}" onclick="toggleCombo('${c.name}')">
       <div class="pad-title">${c.name}</div>
       <div class="pad-sub">${c.description||''}</div>
     </div>
@@ -391,48 +410,25 @@ function renderSpeciesPage(){
     </div>`;
 
   const obs = speciesObservations(sp.id);
-  const behaviorObs = obs.filter(o=>!o.recommendation);
-  const lures = speciesLures(sp.id);
-  const combos = [...new Set(lures.flatMap(l=>l.combos))].map(n => DATA.combos.find(c=>c.name===n)).filter(Boolean);
-  const unassigned = lures.filter(l=>l.combos.length===0);
-  const divergences = findDivergences(obs);
+  const divergences = findConsensusPairs(obs);
+  const TABS = ['Comportement','Leurres','Couleur','Animation'];
 
-  const whereDims = ["maree","moment_jour","spot_type"];
-  const whereBoxes = whereDims.map(dim=>{
-    const vals = [...new Set(obs.map(o=>o.tags[dim]).filter(Boolean))];
-    return `<div class="where-box"><div class="dim-name">${DIM_LABELS[dim]}</div><div class="vals">${vals.length ? vals.join(', ') : '—'}</div></div>`;
-  }).join('');
+  const dotNav = `<div class="dot-nav">
+    ${TABS.map((t,i)=>`<div class="dot-item ${i===speciesTab?'active':''}" onclick="setSpeciesTab(${i})">
+      <div class="dot"></div><div class="dot-label">${t}</div>
+    </div>`).join('')}
+  </div>`;
+
+  const panels = [panelComportement, panelLeurres, panelCouleur, panelAnimation];
 
   document.getElementById('mainZone').innerHTML = `
-    <div class="section">
-      <p class="section-title">Comportement · nov. – mi-déc.</p>
-      ${behaviorObs.length ? behaviorObs.map(factCard).join('') : `<div class="empty">Pas encore d'observation de comportement.</div>`}
-    </div>
-
-    <div class="section">
-      <p class="section-title">Où &amp; quand</p>
-      <div class="where-grid">${whereBoxes}</div>
-    </div>
+    ${dotNav}
+    <div id="tabPanel">${panels[speciesTab](sp, obs)}</div>
 
     ${divergences.length ? `<div class="section">
-      <p class="section-title">Les sources divergent</p>
-      ${divergences.map(divergeCard).join('')}
+      <p class="section-title">Consensus &amp; désaccords (${divergences.length})</p>
+      ${divergences.slice(0,12).map(consensusCard).join('')}
     </div>` : ''}
-
-    <div class="section">
-      <p class="section-title">Top leurres (${lures.length}/10)</p>
-      ${combos.map(c=>{
-        const cl = lures.filter(l=>l.combos.includes(c.name));
-        return `<div class="combo-block">
-          <div class="combo-header"><span class="combo-name">${c.name}</span><span class="combo-desc">${c.description||''}</span></div>
-          ${cl.map(lureRow).join('')}
-        </div>`;
-      }).join('')}
-      ${unassigned.length ? `<div class="combo-block">
-        <div class="combo-header"><span class="combo-name" style="color:var(--text-muted)">Autres</span></div>
-        ${unassigned.map(lureRow).join('')}</div>` : ''}
-      ${!lures.length ? `<div class="empty">Aucun leurre renseigné.</div>` : ''}
-    </div>
 
     <div class="section">
       <p class="section-title">Config du moment</p>
@@ -447,6 +443,81 @@ function renderSpeciesPage(){
   `;
 }
 
+function setSpeciesTab(i){
+  speciesTab = i;
+  const sp = DATA.species.find(s=>s.id===currentSpeciesId);
+  const obs = speciesObservations(sp.id);
+  const panels = [panelComportement, panelLeurres, panelCouleur, panelAnimation];
+  document.getElementById('tabPanel').innerHTML = panels[i](sp, obs);
+  document.querySelectorAll('.dot-item').forEach((el,idx)=>el.classList.toggle('active', idx===i));
+}
+
+/* --- Panneau 1 : comportement + où/quand --- */
+function panelComportement(sp, obs){
+  const behaviorObs = obs.filter(o=>!o.recommendation);
+  const whereDims = ["maree","moment_jour","spot_type"];
+  const whereBoxes = whereDims.map(dim=>{
+    const vals = [...new Set(obs.map(o=>o.tags[dim]).filter(Boolean))];
+    return `<div class="where-box"><div class="dim-name">${DIM_LABELS[dim]}</div><div class="vals">${vals.length ? vals.join(', ') : '—'}</div></div>`;
+  }).join('');
+  return `
+    <div class="section" style="margin-top:0">
+      <p class="section-title">Comportement · nov. – mi-déc.</p>
+      ${behaviorObs.length ? behaviorObs.map(factCard).join('') : `<div class="empty">Pas encore d'observation de comportement.</div>`}
+    </div>
+    <div class="section">
+      <p class="section-title">Où &amp; quand</p>
+      <div class="where-grid">${whereBoxes}</div>
+    </div>`;
+}
+
+/* --- Panneau 2 : types de leurre + top 10 par combo --- */
+function panelLeurres(sp, obs){
+  const lures = speciesLures(sp.id);
+  const combos = [...new Set(lures.flatMap(l=>l.combos))].map(n => DATA.combos.find(c=>c.name===n)).filter(Boolean);
+  const unassigned = lures.filter(l=>l.combos.length===0);
+  const types = [...new Set(lures.map(l=>l.type).filter(Boolean))];
+  return `
+    <div class="section" style="margin-top:0">
+      <p class="section-title">Types de leurre</p>
+      <div class="where-box"><div class="vals">${types.length ? types.join(' · ') : '—'}</div></div>
+    </div>
+    <div class="section">
+      <p class="section-title">Top leurres (${lures.length}/10)</p>
+      ${combos.map(c=>{
+        const cl = lures.filter(l=>l.combos.includes(c.name));
+        return `<div class="combo-block">
+          <div class="combo-header"><span class="combo-name">${c.name}</span><span class="combo-desc">${c.description||''}</span></div>
+          ${cl.map(lureRow).join('')}
+        </div>`;
+      }).join('')}
+      ${unassigned.length ? `<div class="combo-block">
+        <div class="combo-header"><span class="combo-name" style="color:var(--text-muted)">Autres</span></div>
+        ${unassigned.map(lureRow).join('')}</div>` : ''}
+      ${!lures.length ? `<div class="empty">Aucun leurre renseigné.</div>` : ''}
+    </div>`;
+}
+
+/* --- Panneaux 3 & 4 : agrégation des recos couleur / animation, sourcées --- */
+function recoPanel(obs, field, title){
+  const entries = obs.filter(o=>o.recommendation && o.recommendation[field]);
+  if(!entries.length) return `<div class="section" style="margin-top:0">
+    <p class="section-title">${title}</p>
+    <div class="empty">Aucune recommandation sourcée pour l'instant.<br>Elles apparaîtront dès qu'une extraction ou une session terrain en fournit.</div></div>`;
+  return `<div class="section" style="margin-top:0">
+    <p class="section-title">${title}</p>
+    ${entries.map(o=>{
+      const conds = COND_DIMS.filter(d=>o.tags[d]).map(d=>`<span class="tag">${DIM_LABELS[d]}: ${o.tags[d]}</span>`).join('');
+      return `<div class="fact-card">
+        <strong style="color:var(--accent)">${o.recommendation[field]}</strong>
+        ${o.recommendation.lure ? `<span style="color:var(--text-muted); font-size:12.5px"> — sur ${o.recommendation.lure}</span>` : ''}
+        <div class="fact-meta">${conds}<span class="conf-mini ${confClass(o.confidence)}">${o.confidence.toFixed(2)} · ${o.source}</span></div>
+      </div>`;
+    }).join('')}</div>`;
+}
+function panelCouleur(sp, obs){ return recoPanel(obs, 'color', 'Choix de la couleur — selon conditions'); }
+function panelAnimation(sp, obs){ return recoPanel(obs, 'animation', 'Animations — selon conditions'); }
+
 function factCard(o){
   const tags = Object.entries(o.tags||{}).map(([d,v])=>`<span class="tag">${DIM_LABELS[d]||d}: ${v}</span>`).join('');
   return `<div class="fact-card">${o.text}
@@ -460,33 +531,79 @@ function lureRow(l){
     <span class="lure-rank">#${l.rank}</span></div>`;
 }
 
-/* Désaccords : mêmes conditions (≥2 tags partagés parmi les dims de condition), recos différentes */
+/* Désaccords / consensus : similarité de conditions + similarité de recommandation,
+   PAS de correspondance texte exacte. Mots-clés partagés + tags à vocabulaire
+   contrôlé identiques comptent comme "conditions proches". */
 const COND_DIMS = ["maree","moment_jour","couleur_eau","spot_type","saison","pression_atmo"];
-function findDivergences(obs){
+const STOPWORDS = new Set(['les','des','une','un','le','la','de','du','pour','dans','sur','avec','par',
+  'est','sont','plus','tres','peu','vers','apres','avant','entre','depuis','lorsque','comme','tout',
+  'cette','ces','leur','leurs','ils','elle','qui','que','son','ses','sans','pendant','environ','aussi',
+  'ainsi','ete','etre','fait','faire','tant','meme','encore','deja','alors','donc','mais','ou','et',
+  // domaine : trop génériques pour signaler une vraie similarité de conditions
+  'attaque','leurre','poisson','poissons','activite','presence','pris','prise','pecheur','recherche',
+  'anime','animee','presente','presentation','recuperation','zone','secteur','session']);
+
+function normWords(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(w=>w.length>2 && !STOPWORDS.has(w));
+}
+function jaccard(a,b){
+  const A=new Set(normWords(a)), B=new Set(normWords(b));
+  if(!A.size||!B.size) return {score:0, inter:0};
+  let inter=0; A.forEach(w=>{ if(B.has(w)) inter++; });
+  return {score: inter/(A.size+B.size-inter), inter};
+}
+
+function conditionMatch(a,b){
+  let controlled=0;
+  ["maree","moment_jour","couleur_eau","pression_atmo"].forEach(d=>{
+    if(a.tags[d] && a.tags[d]===b.tags[d]) controlled++;
+  });
+  const textA = [a.tags.spot_type,a.tags.comportement].filter(Boolean).join(' ');
+  const textB = [b.tags.spot_type,b.tags.comportement].filter(Boolean).join(' ');
+  const text = jaccard(textA, textB);
+  // au moins 2 tags à vocabulaire contrôlé identiques (un seul tag isolé comme
+  // "nuit" tout seul ne suffit pas à dire que deux sessions sont comparables),
+  // OU au moins 2 mots-clés significatifs partagés sur spot/comportement
+  return {controlled, text: text.score, related: controlled>=2 || (text.score>=0.2 && text.inter>=2)};
+}
+
+function findConsensusPairs(obs){
   const recos = obs.filter(o=>o.recommendation && o.recommendation.lure);
   const pairs = [];
   for(let i=0;i<recos.length;i++){
     for(let j=i+1;j<recos.length;j++){
       const a=recos[i], b=recos[j];
-      if(a.source === b.source) continue;
-      const shared = COND_DIMS.filter(d=>a.tags[d] && a.tags[d]===b.tags[d]);
-      if(shared.length>=2 && a.recommendation.lure !== b.recommendation.lure){
-        pairs.push({a,b,shared});
-      }
+      if(a.source===b.source) continue;
+      const cond = conditionMatch(a,b);
+      if(!cond.related) continue;
+      const lureSim = jaccard(a.recommendation.lure, b.recommendation.lure).score;
+      pairs.push({a, b, cond, lureSim, type: lureSim>=0.25 ? 'consensus' : 'divergence'});
     }
   }
-  return pairs;
+  // priorité : consensus les plus solides d'abord, puis désaccords les plus pertinents
+  return pairs.sort((p,q)=> (q.cond.controlled+q.cond.text) - (p.cond.controlled+p.cond.text));
 }
 
-function divergeCard(p){
-  const conds = p.shared.map(d=>`${DIM_LABELS[d]}: ${p.a.tags[d]}`).join(' · ');
+function conditionLabel(pair){
+  const bits = [];
+  ["maree","moment_jour","couleur_eau","pression_atmo"].forEach(d=>{
+    if(pair.a.tags[d] && pair.a.tags[d]===pair.b.tags[d]) bits.push(`${DIM_LABELS[d]}: ${pair.a.tags[d]}`);
+  });
+  if(pair.cond.text >= 0.2) bits.push('conditions similaires (spot/comportement)');
+  return bits.join(' · ') || 'conditions proches';
+}
+
+function consensusCard(pair){
+  const badge = pair.type === 'consensus' ? 'Consensus' : 'Désaccord';
   const opt = o => `<div class="diverge-opt">
     <div class="who">${o.source} (conf ${o.confidence.toFixed(2)})</div>
     ${o.recommendation.lure}${o.recommendation.animation?' — '+o.recommendation.animation:''}${o.recommendation.color?' — '+o.recommendation.color:''}
   </div>`;
-  return `<div class="diverge-pair">
-    <div class="diverge-conditions">Mêmes conditions : ${conds}</div>
-    ${opt(p.a)}${opt(p.b)}
+  return `<div class="consensus-pair is-${pair.type}">
+    <span class="consensus-badge is-${pair.type}">${badge}</span>
+    <div class="diverge-conditions">${conditionLabel(pair)}</div>
+    ${opt(pair.a)}${opt(pair.b)}
   </div>`;
 }
 

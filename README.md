@@ -48,6 +48,9 @@ python3 pipeline.py add-stop        # inclut la clé du port de marée
 # Retour terrain (après export depuis la PWA)
 python3 pipeline.py import-log sessions-terrain.json
 
+# Extraction faite par GPT (voir prompt-gpt-extraction.md) — pas d'appel API ici
+python3 pipeline.py import-extracted extraction-gpt.json
+
 # Briefs + publication
 python3 pipeline.py brief            # API Claude, cite les obs [#id]
 python3 pipeline.py export           # data.json à la racine

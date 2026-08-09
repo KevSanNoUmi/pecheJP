@@ -354,6 +354,63 @@ def import_log(filepath):
     print(f"{imported} session(s) importée(s) comme observations terrain.")
 
 
+def import_extracted(filepath):
+    """Importe un fichier d'observations déjà extraites (ex: par GPT via le prompt dédié).
+    Format attendu : array d'objets avec source_label, source_type, source_url (optionnel),
+    species, raw_text, recommended_*, tags — même structure que la sortie du pipeline
+    d'extraction interne, mais sans appel API ici (les sources sont créées/réutilisées
+    automatiquement par label)."""
+    with open(filepath, encoding="utf-8") as f:
+        entries = json.load(f)
+
+    conn = get_conn()
+    smap = species_map(conn)
+    weight_map = {"marque": 1.0, "blog": 0.7, "video": 0.7, "terrain": 1.0}
+    source_cache = {}
+
+    imported, ignored = 0, 0
+    for e in entries:
+        label = (e.get("source_label") or "").strip()
+        stype = (e.get("source_type") or "").strip()
+        if not label:
+            print(f"  [IGNORÉ] source_label manquant — {e.get('raw_text','')[:50]}")
+            ignored += 1
+            continue
+
+        cache_key = label.lower()
+        if cache_key not in source_cache:
+            row = conn.execute("SELECT id, weight FROM sources WHERE label = ?", (label,)).fetchone()
+            if row:
+                source_cache[cache_key] = row
+            else:
+                weight = weight_map.get(stype, 0.4)
+                cur = conn.execute(
+                    "INSERT INTO sources (url, type, label, weight) VALUES (?, ?, ?, ?)",
+                    (e.get("source_url") or None, stype if stype in weight_map else "blog", label, weight),
+                )
+                source_cache[cache_key] = (cur.lastrowid, weight)
+        source_id, source_weight = source_cache[cache_key]
+
+        sp_key = (e.get("species") or "").strip().lower()
+        species_id = smap.get(sp_key)
+        if not species_id:
+            print(f"  [IGNORÉ] espèce inconnue '{sp_key}' — {e.get('raw_text','')[:50]}")
+            ignored += 1
+            continue
+
+        obs_id, score, needs_review, skipped = insert_observation(conn, species_id, source_id, source_weight, e)
+        imported += 1
+        flag = "⚠️ À VÉRIFIER" if needs_review else "✓"
+        print(f"  [{flag}] #{obs_id} {sp_key} score={score:.2f} ({label}) — {e['raw_text'][:60]}")
+        for s in skipped:
+            print(f"      tag ignoré: {s}")
+
+    conn.commit()
+    conn.close()
+    print(f"\n{imported} observation(s) importée(s), {ignored} ignorée(s). "
+          f"Lance 'review' puis 'validate <id>' avant l'export.")
+
+
 def brief():
     """Génère un briefing de session par étape, à partir des observations validées."""
     conn = get_conn()
@@ -509,5 +566,7 @@ if __name__ == "__main__":
         link_combo(int(sys.argv[2]), int(sys.argv[3]))
     elif cmd == "import-log":
         import_log(sys.argv[2])
+    elif cmd == "import-extracted":
+        import_extracted(sys.argv[2])
     else:
         print(__doc__)
