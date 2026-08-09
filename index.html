@@ -110,6 +110,11 @@
   .ideal-badge.is-dusk{background:rgba(120,110,200,0.2); color:#9b8fd6;}
   .ideal-tide{font-size:13px; color:var(--text);}
   .ideal-time{margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--text-muted);}
+  .tide-curve{width:100%; height:88px; margin:6px 0 4px; display:block;}
+  .mom-legend{display:flex; flex-direction:column; gap:5px; margin:4px 0 6px;}
+  .mom-row{display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
+  .mom-sp{font-family:'Fraunces', serif; font-size:13px; color:var(--text); min-width:74px;}
+  .mom-tag{font-family:'IBM Plex Mono', monospace; font-size:10px; padding:2px 7px; border-radius:999px; border:1px solid;}
 
   .section{margin-top:22px;}
   .section-title{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
@@ -212,8 +217,21 @@ const PORTS = {
 };
 const D2R = Math.PI/180;
 
-/* Soleil : lever/coucher approché (algo NOAA simplifié) pour lat/lng/date → renvoie {sunrise, sunset} en Date locale JST.
-   Sert à croiser les fenêtres de marée avec l'aube et le crépuscule. */
+/* Heure décimale d'une Date, TOUJOURS exprimée en heure du Japon (JST, UTC+9),
+   indépendamment du fuseau de l'appareil. Évite tout décalage quand on consulte depuis la France. */
+const JST_OFFSET_MS = 9*3.6e6;
+function hrJST(d){
+  if(!d) return null;
+  const j = new Date(d.getTime() + JST_OFFSET_MS);
+  return j.getUTCHours() + j.getUTCMinutes()/60;
+}
+function fmtJST(d){
+  if(!d) return '—';
+  const j = new Date(d.getTime() + JST_OFFSET_MS);
+  const hh = String(j.getUTCHours()).padStart(2,'0');
+  const mm = String(j.getUTCMinutes()).padStart(2,'0');
+  return `${hh}:${mm}`;
+}
 function sunTimes(lat, lng, date){
   const rad=Math.PI/180, deg=180/Math.PI;
   const start = new Date(Date.UTC(date.getFullYear(),0,0));
@@ -306,23 +324,122 @@ function nextExtremes(portKey, date){
   return out;
 }
 
-function tideCurveSVG(portKey){
-  const now = new Date();
+/* Meilleurs moments par espèce, dérivés des observations (fréquence moment_jour).
+   Renvoie un objet {espèce: [{moment, pct}]} trié, calculé une fois les données chargées. */
+function bestMomentsBySpecies(){
+  const acc = {};
+  DATA.observations.forEach(o=>{
+    const mj = o.tags && o.tags.moment_jour; if(!mj) return;
+    const sp = o.species;
+    (acc[sp] = acc[sp] || {})[mj] = (acc[sp][mj]||0)+1;
+  });
+  const out = {};
+  Object.entries(acc).forEach(([sp,c])=>{
+    const tot = Object.values(c).reduce((a,b)=>a+b,0);
+    out[sp] = Object.entries(c).map(([m,n])=>({moment:m, pct:Math.round(100*n/tot)}))
+      .sort((a,b)=>b.pct-a.pct);
+  });
+  return out;
+}
+
+const MOMENT_COLORS = {
+  aube:       '#E8A33D',   // ambre
+  jour:       '#6FB1D6',   // bleu clair
+  crépuscule: '#9b8fd6',   // violet
+  nuit:       '#3f5170',   // bleu nuit
+};
+
+/* Convertit un moment_jour en plage horaire [hDébut,hFin] pour un jour donné, à partir du soleil réel. */
+function momentRange(portKey, date, moment){
+  const p = PORTS[portKey]; if(!p||p.lat==null) return null;
+  const sun = sunTimes(p.lat, p.lng, date);
+  const hr = d => hrJST(d);
+  const sr = hr(sun.sunrise), ss = hr(sun.sunset);
+  if(sr==null||ss==null) return null;
+  switch(moment){
+    case 'aube':       return [sr-1, sr+1.5];
+    case 'crépuscule': return [ss-1.5, ss+1];
+    case 'jour':       return [sr+1.5, ss-1.5];
+    case 'nuit':       return [ss+1, sr-1+24]; // traverse minuit
+    default: return null;
+  }
+}
+
+function tideCurveSVG(portKey, refDate, speciesFilter){
+  const base = refDate ? new Date(refDate) : new Date();
+  // fenêtre : minuit → minuit+24h du jour de référence, en heure locale JST
+  const dayStart = new Date(base); dayStart.setHours(0,0,0,0);
   const pts = [];
   let min = Infinity, max = -Infinity;
-  for(let m=-120; m<=12*60; m+=20){
-    const h = tideHeight(portKey, new Date(now.getTime() + m*6e4));
+  for(let m=0; m<=24*60; m+=15){
+    const h = tideHeight(portKey, new Date(dayStart.getTime() + m*6e4));
     pts.push([m, h]); if(h<min)min=h; if(h>max)max=h;
   }
-  const W=400, H=52, span = max-min || 1;
-  const X = m => (m+120)/(14*60)*W;
-  const Y = h => H-6 - (h-min)/span*(H-12);
+  const W=400, H=88, span = max-min || 1;
+  const topPad = 22; // place pour les bandes espèces au-dessus
+  const X = m => m/(24*60)*W;
+  const Y = h => H-8 - (h-min)/span*(H-topPad-8);
   const path = pts.map((p,i)=>`${i?'L':'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(' ');
-  const nowX = X(0);
+
+  const p = PORTS[portKey];
+  const sun = (p && p.lat!=null) ? sunTimes(p.lat, p.lng, dayStart) : {};
+  const hourToX = hr => X(((hr%24)+24)%24 * 60);
+
+  // bandes aube / crépuscule (fond)
+  let lightBands = '';
+  ['aube','crépuscule'].forEach(mo=>{
+    const r = momentRange(portKey, dayStart, mo); if(!r) return;
+    const x1=hourToX(r[0]), x2=hourToX(r[1]);
+    lightBands += `<rect x="${Math.min(x1,x2).toFixed(1)}" y="${topPad}" width="${Math.abs(x2-x1).toFixed(1)}" height="${H-topPad}" fill="${MOMENT_COLORS[mo]}" opacity="0.10"/>`;
+    lightBands += `<text x="${((x1+x2)/2).toFixed(1)}" y="${H-2}" font-size="7" fill="${MOMENT_COLORS[mo]}" text-anchor="middle" font-family="monospace">${mo}</text>`;
+  });
+  // lignes lever / coucher
+  let sunLines = '';
+  if(sun.sunrise){ const x=hourToX(hrJST(sun.sunrise)); sunLines+=`<line x1="${x}" y1="${topPad}" x2="${x}" y2="${H}" stroke="${MOMENT_COLORS.aube}" stroke-width="0.8" stroke-dasharray="2,2"/>`; }
+  if(sun.sunset){ const x=hourToX(hrJST(sun.sunset)); sunLines+=`<line x1="${x}" y1="${topPad}" x2="${x}" y2="${H}" stroke="${MOMENT_COLORS['crépuscule']}" stroke-width="0.8" stroke-dasharray="2,2"/>`; }
+
+  // bandes "meilleurs moments" par espèce (en haut), tags couleur
+  let speciesBands = '';
+  const best = bestMomentsBySpecies();
+  let targets = speciesFilter && speciesFilter.length ? speciesFilter : Object.keys(best);
+  // ne garder que le meilleur moment (>=40%) de chaque espèce ciblée, empilées
+  let row = 0;
+  targets.forEach(sp=>{
+    const arr = best[sp]; if(!arr||!arr.length) return;
+    const top = arr.filter(x=>x.pct>=30).slice(0,2); // 1 à 2 créneaux dominants
+    top.forEach(({moment,pct})=>{
+      const r = momentRange(portKey, dayStart, moment); if(!r) return;
+      const y = 2 + row*6;
+      if(moment==='nuit'){
+        // deux segments (avant minuit + après)
+        const xA1=hourToX(r[0]), xA2=W, xB1=0, xB2=hourToX(r[1]-24);
+        speciesBands += `<rect x="${xA1.toFixed(1)}" y="${y}" width="${(xA2-xA1).toFixed(1)}" height="4" rx="1" fill="${MOMENT_COLORS[moment]}"/>`;
+        speciesBands += `<rect x="${xB1}" y="${y}" width="${xB2.toFixed(1)}" height="4" rx="1" fill="${MOMENT_COLORS[moment]}"/>`;
+      } else {
+        const x1=hourToX(r[0]), x2=hourToX(r[1]);
+        speciesBands += `<rect x="${Math.min(x1,x2).toFixed(1)}" y="${y}" width="${Math.abs(x2-x1).toFixed(1)}" height="4" rx="1" fill="${MOMENT_COLORS[moment]}"/>`;
+      }
+    });
+    row++;
+  });
+
   return `<svg class="tide-curve" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    ${lightBands}${sunLines}
     <path d="${path}" fill="none" stroke="#E8A33D" stroke-width="1.6"/>
-    <line x1="${nowX}" y1="0" x2="${nowX}" y2="${H}" stroke="#5FA87A" stroke-width="1" stroke-dasharray="3,3"/>
+    ${speciesBands}
   </svg>`;
+}
+
+/* Légende des tags couleur espèce×moment, pour une liste d'espèces ciblées */
+function momentLegend(speciesList){
+  const best = bestMomentsBySpecies();
+  const rows = (speciesList||[]).map(sp=>{
+    const arr = best[sp]; if(!arr||!arr.length) return '';
+    const top = arr.filter(x=>x.pct>=30).slice(0,2);
+    const tags = top.map(({moment,pct})=>`<span class="mom-tag" style="background:${MOMENT_COLORS[moment]}22;color:${MOMENT_COLORS[moment]};border-color:${MOMENT_COLORS[moment]}">${moment} ${pct}%</span>`).join(' ');
+    return `<div class="mom-row"><span class="mom-sp">${sp}</span>${tags}</div>`;
+  }).filter(Boolean).join('');
+  return rows ? `<div class="mom-legend">${rows}</div>` : '';
 }
 
 /* ============ ÉTAT GLOBAL ============ */
@@ -496,11 +613,11 @@ function stopDetail(s){
     // Ancrage sur le PREMIER JOUR sur place (arrival_date) plutôt que "maintenant"
     const refDate = s.arrival_date ? new Date(s.arrival_date+'T09:00:00+09:00') : new Date();
     const dateLabel = s.arrival_date
-      ? new Date(s.arrival_date+'T09:00:00+09:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})
+      ? new Date(s.arrival_date+'T09:00:00+09:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Asia/Tokyo'})
       : 'maintenant';
     const ext = nextExtremes(s.port, refDate);
-    const fmt = d => d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    const fmtR = d => d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const fmt = fmtJST;
+    const fmtR = fmtJST;
     const wins = idealWindows(s.port, refDate);
     const sun = sunTimes(PORTS[s.port].lat, PORTS[s.port].lng, refDate);
 
@@ -519,7 +636,9 @@ function stopDetail(s){
       <div class="k" style="margin-top:12px">☀︎ Soleil : ${sun.sunrise?fmt(sun.sunrise):'—'} → ${sun.sunset?fmt(sun.sunset):'—'}</div>
       <div class="k" style="margin-top:12px">Fenêtres idéales — marée active × aube/crépuscule</div>
       ${winHTML}
-      ${tideCurveSVG(s.port)}
+      <div class="k" style="margin-top:12px">Courbe de marée — ${dateLabel}</div>
+      ${tideCurveSVG(s.port, refDate, s.target_species)}
+      ${momentLegend(s.target_species)}
       <button class="session-btn" onclick="event.stopPropagation();setActivePort('${s.port}');renderHome()">Pêcher ici — activer ce port</button>`;
   }
 

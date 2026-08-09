@@ -1,5 +1,5 @@
 // Service worker — offline app shell for Carnet Pêche JP
-const CACHE = 'carnet-peche-jp-v8';
+const CACHE = 'carnet-peche-jp-v10';
 // Shell minimal indispensable. Les JSON de données sont mis en cache à la volée (réseau d'abord),
 // PAS dans addAll — sinon un seul 404 casse toute l'installation et provoque un écran blanc.
 const SHELL = ['./', './index.html'];
