@@ -1,10 +1,19 @@
 // Service worker — offline app shell for Carnet Pêche JP
-const CACHE = 'carnet-peche-jp-v5';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './synthesis.json', './lure_typology.json', './icon-192.png', './icon-512.png'];
+const CACHE = 'carnet-peche-jp-v6';
+// Shell minimal indispensable. Les JSON de données sont mis en cache à la volée (réseau d'abord),
+// PAS dans addAll — sinon un seul 404 casse toute l'installation et provoque un écran blanc.
+const SHELL = ['./', './index.html'];
+const OPTIONAL = ['./manifest.webmanifest', './synthesis.json', './lure_typology.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}));
+  e.waitUntil(
+    caches.open(CACHE).then((c) =>
+      // shell critique : doit réussir ; optionnels : best-effort, chaque échec ignoré individuellement
+      c.addAll(SHELL)
+       .then(() => Promise.allSettled(OPTIONAL.map((u) => c.add(u).catch(() => {}))))
+    ).catch(() => {})
+  );
 });
 
 self.addEventListener('activate', (e) => {

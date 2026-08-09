@@ -939,7 +939,33 @@ function exportSessions(){
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
-loadData();
+
+// Filet de sécurité : jamais d'écran blanc muet. Si le démarrage plante ou traîne, on affiche un message + reset.
+function showFatal(msg){
+  document.getElementById('mainZone').innerHTML =
+    '<div style="padding:24px;font-family:sans-serif;color:#ddd">'
+    + '<h3 style="color:#E8A33D">Chargement impossible</h3>'
+    + '<p style="opacity:.8;font-size:14px">'+(msg||'')+'</p>'
+    + '<button onclick="resetApp()" style="margin-top:12px;padding:10px 16px;background:#E8A33D;border:none;border-radius:8px;font-weight:600">Vider le cache et recharger</button>'
+    + '</div>';
+}
+function resetApp(){
+  if('serviceWorker' in navigator){ navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())); }
+  if(window.caches){ caches.keys().then(ks=>ks.forEach(k=>caches.delete(k))).then(()=>location.reload(true)); }
+  else location.reload(true);
+}
+window.addEventListener('error', (e)=>{
+  if(!document.getElementById('mainZone').innerHTML.trim()) showFatal(e.message);
+});
+const _bootTimer = setTimeout(()=>{
+  if(!document.getElementById('mainZone').innerHTML.trim()) showFatal('Délai dépassé au chargement des données.');
+}, 6000);
+
+(async ()=>{
+  try{ await loadData(); }
+  catch(e){ showFatal(e.message); }
+  finally{ clearTimeout(_bootTimer); }
+})();
 </script>
 </body>
 </html>
