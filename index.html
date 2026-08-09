@@ -950,34 +950,52 @@ function activityLevel(o){
   return null;
 }
 
-/* Typologie d'ACTION (ce qu'on fait une fois le leurre à l'eau) — ce qui compte vraiment à la pêche.
-   Deux leurres différents avec la même action = consensus d'animation, PAS un désaccord.
-   On classe l'animation (et le texte) dans des familles de gestes. */
-const ACTION_PATTERNS = {
-  "fond puis récupération":   ["prendre le fond","contact avec le fond","prendre contact","atteindre le fond","depuis le fond","part du fond","toucher le fond","récupér","remont","du fond"],
-  "stop-and-go / pauses":     ["stop-and-go","stop and go","arrêt","pause","stoppe","marque un temps","interrompu","séquence"],
-  "lift-and-fall / dandine":  ["lift-and-fall","lift and fall","dandine","tirée puis","soulever","relever puis","jerk puis chute","jig"],
-  "chute / fall (laisser descendre)": ["chute","fall","laisser descendre","laisser tomber","free fall","tension fall","redescendre","descente"],
-  "dérive dans le courant":   ["dériv","laisser filer","accompagner le courant","dans le courant","dérive latérale","drift"],
-  "récupération linéaire":    ["linéaire","récupération continue","récupération régulière","ramener régulièrement","récupération lente","dead slow","récupération rapide","récupération simple"],
-  "jerk / twitch (animation de canne)": ["jerk","twitch","dog walk","écart","glisse","short jerk","long jerk","animation de canne","tirées","saccad"],
-  "surface / induction":      ["surface","topwater","誘い出し","induction","wake","faire monter","sub-surface"],
-};
+/* Typologie d'ACTION — le GESTE réel une fois le leurre à l'eau. Distinctions techniques strictes
+   (demande explicite de l'utilisateur) : le geste de CANNE, le rôle du fond et de la chute comptent,
+   pas la marque. Chaque obs reçoit UNE catégorie dominante (la plus spécifique), jamais plusieurs.
 
-function actionCategories(o){
+   - lift-and-fall / jig    : tirées de CANNE pour décoller le leurre du FOND, puis chute contrôlée à la bannière (touche à la retombée)
+   - fall / chute (egi…)    : on laisse DESCENDRE le leurre, prise pendant la chute — sans tirée de décollage du fond
+   - jerk / twitch / dog-walk: animation de CANNE (coups de scion, écarts) SANS logique de fond
+   - stop-and-go            : récupération MOULINET entrecoupée d'ARRÊTS
+   - linéaire               : récupération MOULINET continue, AUCUN mouvement de canne
+   - dérive                 : on accompagne le COURANT, récupération minimale
+   - surface / induction    : travail en surface (topwater, 誘い出し) */
+const ACTION_PATTERNS = [
+  {cat:"lift-and-fall (canne, décollage du fond + chute)",
+   any:["lift-and-fall","lift and fall","one-pitch","one pitch","remontée rythmée depuis le fond","remonte en one-pitch","soulever le montage","relever puis","décoll","remontées et descentes en laissant le leurre retomber","fast pitch"],
+   // doit impliquer canne + fond/chute
+  },
+  {cat:"fall / chute contrôlée (laisser descendre)",
+   any:["free fall","tension fall","カーブフォール","descente en courbe","shimmy fall","back-roll","rolling fall","laisser l'egi retomber","laisser descendre","chute horizontale","laisser tomber","chute contrôlée","10 secondes de chute","allonger le temps de descente","descente stable","descente progressive"],
+  },
+  {cat:"jerk / twitch / dog-walk (animation de canne, sans logique de fond)",
+   any:["jerk","twitch","dog walk","dog-walk","écart","glisse","glissade","dart","pop","zigzag","tirée","impulsion de canne","animation souple imprimée","pointe de la canne","誘い出し","induction"],
+  },
+  {cat:"stop-and-go (moulinet + arrêts)",
+   any:["stop-and-go","stop and go","arrêt","pause","interrompre","interrompu","tours puis arrêt","tours de manivelle puis arrêt","marquer un arrêt","puis marquer une pause"],
+  },
+  {cat:"dérive dans le courant",
+   any:["dériv","drift","accompagner le courant","dérive du courant","laisser filer","dans le courant en conservant","vitesse de dérive"],
+  },
+  {cat:"récupération linéaire (moulinet continu, sans canne)",
+   any:["linéaire","récupération continue","récupération régulière","récupération lente","récupération très lente","dead slow","récupération simple","récupération rapide","tour de manivelle toutes les","récupération dead slow","balancement de la queue","récupération sous la surface","récupération minimale","digital retrieve","ジャカ巻き","prospection large en récupération"],
+  },
+  {cat:"surface / topwater",
+   any:["surface","topwater","top water","wake","sous la surface","juste sous la surface","planante","en surface"],
+  },
+];
+
+/* Renvoie LA catégorie d'action dominante d'une obs (la première règle qui matche, ordre = spécificité),
+   ou null si le geste n'est pas décrit. */
+function actionCategory(o){
   const rec = o.recommendation || {};
-  const blob = ((rec.animation||'') + ' ' + (o.tags && o.tags.comportement || '') + ' ' + (o.text||'')).toLowerCase();
-  const cats = [];
-  for(const [cat, kws] of Object.entries(ACTION_PATTERNS)){
-    if(kws.some(k=>blob.includes(k.toLowerCase()))) cats.push(cat);
+  const blob = ((rec.animation||'') + ' ' + (o.tags && o.tags.comportement || '')).toLowerCase();
+  if(!blob.trim()) return null;
+  for(const p of ACTION_PATTERNS){
+    if(p.any.some(k=>blob.includes(k.toLowerCase()))) return p.cat;
   }
-  return cats;
-}
-function actionSim(a,b){
-  const A = new Set(actionCategories(a)), B = new Set(actionCategories(b));
-  if(!A.size || !B.size) return {shared:[], score:0};
-  const shared = [...A].filter(x=>B.has(x));
-  return {shared, score: shared.length / Math.max(A.size, B.size)};
+  return null;
 }
 
 function findConsensusPairs(obs){
@@ -991,28 +1009,26 @@ function findConsensusPairs(obs){
       if(!cond.related) continue;
 
       const lureSim = jaccard(a.recommendation.lure, b.recommendation.lure).score;
-      // Comparaison des familles de leurre via la typologie vérifiée (si dispo)
       const famA = a.recommendation.typology && a.recommendation.typology.famille;
       const famB = b.recommendation.typology && b.recommendation.typology.famille;
       const sameFamille = famA && famB && famA===famB;
-      const act = actionSim(a,b);
+      const actA = actionCategory(a), actB = actionCategory(b);
+      const sameAction = actA && actB && actA===actB;   // MÊME geste exact, pas un chevauchement flou
 
-      let type, actKind=null;
+      let type, actKind=null, levA=null, levB=null;
       if(lureSim>=0.25 || sameFamille){
-        type = 'consensus';                 // même leurre / même famille
-      } else if(act.shared.length){
-        type = 'consensus-action';          // leurres différents MAIS même typologie d'action
-        actKind = act.shared[0];
+        type = 'consensus';                        // même leurre / même famille
+      } else if(sameAction){
+        type = 'consensus-action';                 // leurres différents MAIS strictement le même geste
+        actKind = actA;
       } else {
-        // vrai écart de reco → adaptation à l'activité, ou désaccord
-        const actA = activityLevel(a), actB = activityLevel(b);
-        if(actA && actB && actA!==actB){ type = 'adaptation'; pairs.push({a,b,cond,lureSim,type,actA,actB}); continue; }
-        type = 'divergence';
+        levA = activityLevel(a); levB = activityLevel(b);
+        if(levA && levB && levA!==levB){ type = 'adaptation'; }
+        else { type = 'divergence'; }
       }
-      pairs.push({a, b, cond, lureSim, type, actKind, sharedActions: act.shared});
+      pairs.push({a, b, cond, lureSim, type, actKind, actA, actB, levA, levB});
     }
   }
-  // ordre : consensus d'abord, puis consensus-action, puis adaptation, puis désaccords
   const rank = {consensus:0,'consensus-action':1,adaptation:2,divergence:3};
   return pairs.sort((p,q)=> (rank[p.type]-rank[q.type]) || ((q.cond.controlled+q.cond.text)-(p.cond.controlled+p.cond.text)));
 }
@@ -1031,19 +1047,19 @@ function consensusCard(pair){
   const badge = labels[pair.type];
   let note = '';
   if(pair.type==='adaptation'){
-    note = `<div class="diverge-conditions" style="color:#7FA8C9">Pas une contradiction : réponses à deux états d'activité (${pair.actA} vs ${pair.actB})</div>`;
+    note = `<div class="diverge-conditions" style="color:#7FA8C9">Pas une contradiction : réponses à deux états d'activité (${pair.levA} vs ${pair.levB})</div>`;
   } else if(pair.type==='consensus-action'){
     note = `<div class="diverge-conditions" style="color:#5FA87A">Même geste à l'eau — <strong>${pair.actKind}</strong> — avec deux leurres différents. Ce qui compte, c'est l'action, pas le modèle.</div>`;
   }
-  const opt = (o,act) => `<div class="diverge-opt">
-    <div class="who">${o.source} (conf ${o.confidence.toFixed(2)})${act?` · poissons ${act}s`:''}</div>
+  const opt = (o,lev) => `<div class="diverge-opt">
+    <div class="who">${o.source} (conf ${o.confidence.toFixed(2)})${lev?` · poissons ${lev}s`:''}</div>
     ${o.recommendation.lure}${o.recommendation.animation?' — '+o.recommendation.animation:''}${o.recommendation.color?' — '+o.recommendation.color:''}
   </div>`;
   return `<div class="consensus-pair is-${pair.type}">
     <span class="consensus-badge is-${pair.type}">${badge}</span>
     <div class="diverge-conditions">${conditionLabel(pair)}</div>
     ${note}
-    ${opt(pair.a, pair.type==='adaptation'?pair.actA:null)}${opt(pair.b, pair.type==='adaptation'?pair.actB:null)}
+    ${opt(pair.a, pair.type==='adaptation'?pair.levA:null)}${opt(pair.b, pair.type==='adaptation'?pair.levB:null)}
   </div>`;
 }
 
