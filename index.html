@@ -307,6 +307,25 @@ function tideState(portKey, date){
   return rate > 0 ? 'montante' : 'descendante';
 }
 
+function dayExtremes(portKey, refDate){
+  // Tous les extrêmes (PM/BM) du jour AFFICHÉ, ancré à minuit JST — cohérent avec la courbe.
+  const jstMs = refDate.getTime() + JST_OFFSET_MS;
+  const dayStartMs = Math.floor(jstMs/864e5)*864e5 - JST_OFFSET_MS;
+  const out = [];
+  let prev = tideHeight(portKey, new Date(dayStartMs));
+  let prevSlope = null;
+  for(let m=15; m<=24*60; m+=15){
+    const t = new Date(dayStartMs + m*6e4);
+    const cur = tideHeight(portKey, t);
+    const slope = cur - prev;
+    if(prevSlope !== null && Math.sign(slope) !== Math.sign(prevSlope) && Math.sign(prevSlope) !== 0){
+      out.push({type: prevSlope > 0 ? 'PM' : 'BM', time: new Date(t.getTime() - 15*6e4)});
+    }
+    prevSlope = slope; prev = cur;
+  }
+  return out;
+}
+
 function nextExtremes(portKey, date){
   // échantillonne 30 min sur 26h, détecte les changements de signe de pente
   const out = [];
@@ -367,17 +386,21 @@ function momentRange(portKey, date, moment){
 
 function tideCurveSVG(portKey, refDate, speciesFilter){
   const base = refDate ? new Date(refDate) : new Date();
-  // fenêtre : minuit → minuit+24h du jour de référence, en heure locale JST
-  const dayStart = new Date(base); dayStart.setHours(0,0,0,0);
+  // Minuit JST du jour de référence : on prend le timestamp, on décale en JST, on tronque à minuit,
+  // puis on repasse en UTC. Garantit que l'axe X = 00:00→24:00 JST, cohérent avec hrJST et les bandes.
+  const jstMs = base.getTime() + JST_OFFSET_MS;
+  const jstMidnight = Math.floor(jstMs / 864e5) * 864e5;      // minuit JST exprimé en "ms JST"
+  const dayStartMs = jstMidnight - JST_OFFSET_MS;             // reconverti en instant UTC réel
   const pts = [];
   let min = Infinity, max = -Infinity;
   for(let m=0; m<=24*60; m+=15){
-    const h = tideHeight(portKey, new Date(dayStart.getTime() + m*6e4));
+    const h = tideHeight(portKey, new Date(dayStartMs + m*6e4));
     pts.push([m, h]); if(h<min)min=h; if(h>max)max=h;
   }
   const W=400, H=88, span = max-min || 1;
   const topPad = 22; // place pour les bandes espèces au-dessus
   const X = m => m/(24*60)*W;
+  const dayStart = new Date(dayStartMs); // Date à minuit JST, pour sunTimes/momentRange
   const Y = h => H-8 - (h-min)/span*(H-topPad-8);
   const path = pts.map((p,i)=>`${i?'L':'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(' ');
 
@@ -615,7 +638,7 @@ function stopDetail(s){
     const dateLabel = s.arrival_date
       ? new Date(s.arrival_date+'T09:00:00+09:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Asia/Tokyo'})
       : 'maintenant';
-    const ext = nextExtremes(s.port, refDate);
+    const ext = dayExtremes(s.port, refDate);
     const fmt = fmtJST;
     const fmtR = fmtJST;
     const wins = idealWindows(s.port, refDate);
