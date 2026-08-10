@@ -683,6 +683,9 @@ function stopDetail(s){
     const fmt = fmtJST;
     const fmtR = fmtJST;
     const wins = idealWindows(s.port, refDate);
+    // Espèces pour les bandes/légende de la courbe : les cibles si définies, sinon TOUTES les espèces documentées
+    const documented = Object.keys(bestMomentsBySpecies());
+    const effectiveSpecies = (s.target_species && s.target_species.length) ? s.target_species : documented;
     const sun = sunTimes(PORTS[s.port].lat, PORTS[s.port].lng, refDate);
 
     const winHTML = wins.length ? wins.map(w=>`
@@ -700,9 +703,9 @@ function stopDetail(s){
       <div class="k" style="margin-top:12px">☀︎ Soleil : ${sun.sunrise?fmt(sun.sunrise):'—'} → ${sun.sunset?fmt(sun.sunset):'—'}</div>
       <div class="k" style="margin-top:12px">Fenêtres idéales — marée active × aube/crépuscule</div>
       ${winHTML}
-      <div class="k" style="margin-top:12px">Courbe de marée — ${dateLabel}</div>
-      ${tideCurveSVG(s.port, refDate, s.target_species)}
-      ${momentLegend(s.target_species)}
+      <div class="k" style="margin-top:12px">Courbe de marée — ${dateLabel}${(!s.target_species||!s.target_species.length)?' · <span style="color:var(--text-muted)">toutes espèces</span>':''}</div>
+      ${tideCurveSVG(s.port, refDate, effectiveSpecies)}
+      ${momentLegend(effectiveSpecies)}
       <button class="session-btn" onclick="event.stopPropagation();setActivePort('${s.port}');renderHome()">Pêcher ici — activer ce port</button>`;
   }
 
