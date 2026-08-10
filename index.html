@@ -53,6 +53,7 @@
   .pad-detail .k:first-child{margin-top:0;}
   .pad-detail .chips{display:flex; flex-wrap:wrap; gap:6px;}
   .pad-detail .chip{background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:4px 10px; font-size:12px;}
+  .chip-empty{font-size:12px; color:var(--text-muted); font-style:italic;}
   .pad-detail .chip.linkable{color:var(--accent); cursor:pointer; border-color:var(--accent);}
 
   .tide-now{display:flex; align-items:center; gap:10px; margin:6px 0;}
@@ -60,8 +61,14 @@
   .tide-next{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--text-muted);}
   .tide-curve{width:100%; height:52px; margin-top:6px;}
 
-  .brief-box{background:var(--surface); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:11px 12px; margin-top:8px; font-size:12.8px; line-height:1.55; white-space:pre-wrap;}
+  .brief-box{background:var(--surface); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:11px 12px; margin-top:8px; font-size:12.8px; line-height:1.55;}
   .brief-box .obs-ref{color:var(--accent); font-family:'IBM Plex Mono', monospace; font-size:11px;}
+  .brief-h1{font-family:'Fraunces', serif; font-weight:600; font-size:15px; color:var(--text); margin-bottom:4px;}
+  .brief-h{font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--accent); margin:12px 0 5px;}
+  .brief-ul{margin:0 0 4px; padding-left:16px;}
+  .brief-ul li{margin-bottom:5px;}
+  .brief-box p{margin:0 0 6px;}
+  .brief-box em{color:var(--text-muted); font-style:italic;}
 
   .session-btn{display:block; width:100%; text-align:center; background:var(--surface); border:1px solid var(--accent); color:var(--accent); border-radius:10px; padding:10px; font-size:13px; font-weight:600; cursor:pointer; margin-top:10px;}
 
@@ -640,13 +647,30 @@ function renderHome(){
   `;
 }
 
+function briefMd(s){
+  // rendu léger markdown pour les briefs destination : # / ## titres, - listes, *italique*, [#N] refs
+  const esc = (s||'').replace(/\[#(\d+)\]/g,'<span class="obs-ref">[#$1]</span>');
+  const lines = esc.split('\n');
+  let html = '', inList = false;
+  for(let ln of lines){
+    if(/^##\s+/.test(ln)){ if(inList){html+='</ul>';inList=false;} html+=`<div class="brief-h">${ln.replace(/^##\s+/,'')}</div>`; }
+    else if(/^#\s+/.test(ln)){ if(inList){html+='</ul>';inList=false;} html+=`<div class="brief-h1">${ln.replace(/^#\s+/,'')}</div>`; }
+    else if(/^-\s+/.test(ln)){ if(!inList){html+='<ul class="brief-ul">';inList=true;} html+=`<li>${ln.replace(/^-\s+/,'').replace(/\*(.+?)\*/g,'<em>$1</em>')}</li>`; }
+    else if(ln.trim()===''){ if(inList){html+='</ul>';inList=false;} }
+    else { if(inList){html+='</ul>';inList=false;} html+=`<p>${ln.replace(/\*(.+?)\*/g,'<em>$1</em>')}</p>`; }
+  }
+  if(inList) html+='</ul>';
+  return html;
+}
+
 function stopDetail(s){
-  const chips = s.target_species.map(name=>{
+  const targets = s.target_species || [];
+  const chips = targets.length ? targets.map(name=>{
     const sp = DATA.species.find(x=>x.name_fr.toLowerCase()===name.toLowerCase());
     return sp
       ? `<span class="chip linkable" onclick="event.stopPropagation();location.hash='species/${sp.id}'">${name}</span>`
       : `<span class="chip">${name}</span>`;
-  }).join('');
+  }).join('') : `<span class="chip-empty">À définir — tes espèces cibles pour ce spot</span>`;
 
   let tideBlock = '';
   if(s.port && PORTS[s.port]){
@@ -683,8 +707,8 @@ function stopDetail(s){
   }
 
   const briefBlock = s.brief
-    ? `<div class="k">Briefing de session</div>
-       <div class="brief-box">${s.brief.replace(/\[#(\d+)\]/g,'<span class="obs-ref">[#$1]</span>')}</div>`
+    ? `<div class="k">Brief destination</div>
+       <div class="brief-box">${briefMd(s.brief)}</div>`
     : `<div class="k">Briefing</div><div class="tide-next">Pas encore généré — lance pipeline.py brief après avoir validé des observations.</div>`;
 
   return `<div class="pad-detail" onclick="event.stopPropagation()">
